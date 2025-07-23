@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { API_BASE_URL } from "../../api"; 
+import { API_BASE_URL } from "../../api";
 
 type Report = {
   report_id: number;
