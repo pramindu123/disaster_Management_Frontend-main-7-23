@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import districtGnDivisions from "../data/districtDivisionalSecretariats";
 import DisasterMap from "../components/DisasterMap";
-import { API_BASE_URL } from "../api";
 
 const rowsPerPage = 6;
 
@@ -62,8 +61,10 @@ function StatCard({
 
 interface Alert {
   id: number;
-  title: string;
-  description: string;
+  type: string;
+  severity: string;
+  date: string;
+  time: string;
   latitude: number;
   longitude: number;
   district?: string;
@@ -78,15 +79,17 @@ interface AidRequest {
   divisional_secretariat: string;
   latitude: number;
   longitude: number;
-  contact_no?: string; 
+  contact_no?: string;
 }
 
 export default function Home() {
   const [aidRequests, setAidRequests] = useState<AidRequest[]>([]);
+  const [deliveredAidRequests, setDeliveredAidRequests] = useState<AidRequest[]>([]);
   const [alerts, setAlerts] = useState<Alert[]>([]);
 
   const [showAlerts, setShowAlerts] = useState(true);
   const [showAidRequests, setShowAidRequests] = useState(true);
+  const [showDeliveredAid, setShowDeliveredAid] = useState(true);
 
   const [activeVolunteers, setActiveVolunteers] = useState(0);
   const [alertsSent, setAlertsSent] = useState(0);
@@ -115,25 +118,37 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-  const fetchAidRequests = async () => {
-    try {
-      // Fetch ongoing aid requests (both emergency and post-disaster)
-      const res = await fetch(`${API_BASE_URL}/AidRequest/ongoing`);
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-      const data = await res.json();
-      setAidRequests(data);
-    } catch (err) {
-      console.error("Error fetching aid requests:", err);
-    }
-  };
-  fetchAidRequests();
-}, []);
+    const fetchAidRequests = async () => {
+      try {
+        const res = await fetch("http://localhost:5158/AidRequest/ongoing");
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        setAidRequests(data);
+      } catch (err) {
+        console.error("Error fetching aid requests:", err);
+      }
+    };
+    fetchAidRequests();
+  }, []);
 
+  useEffect(() => {
+    const fetchDeliveredAidRequests = async () => {
+      try {
+        const res = await fetch("http://localhost:5158/AidRequest/delivered");
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        const data = await res.json();
+        setDeliveredAidRequests(data);
+      } catch (err) {
+        console.error("Error fetching delivered aid requests:", err);
+      }
+    };
+    fetchDeliveredAidRequests();
+  }, []);
 
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/Alerts/all`);
+        const res = await fetch("http://localhost:5158/Alerts/all");
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         const savedDistrict = localStorage.getItem("selectedDistrict");
@@ -149,9 +164,9 @@ export default function Home() {
     const fetchStats = async () => {
       try {
         const [vol, alerts, aid] = await Promise.all([
-          fetch(`${API_BASE_URL}/active-volunteers-count`),
-          fetch(`${API_BASE_URL}/alerts-sent-count`),
-          fetch(`${API_BASE_URL}/total-aid-requests-count`),
+          fetch("http://localhost:5158/active-volunteers-count"),
+          fetch("http://localhost:5158/alerts-sent-count"),
+          fetch("http://localhost:5158/total-aid-requests-count"),
         ]);
         if (!vol.ok || !alerts.ok || !aid.ok) throw new Error("Failed to fetch statistics");
         setActiveVolunteers((await vol.json()).count);
@@ -244,11 +259,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Map */}
+        {/* Map */}
       <section className="w-full mb-16 max-w-7xl mx-auto px-4">
         <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">Live Disaster Map</h2>
         <p className="text-lg text-gray-700 mb-6">
-          View affected areas, aid requests, and deliveries.
+          View affected areas, aid requests, delivered aid, and active alerts.
         </p>
 
         <div className="flex gap-6 mb-4">
@@ -266,20 +281,30 @@ export default function Home() {
               checked={showAidRequests}
               onChange={() => setShowAidRequests(!showAidRequests)}
             />
-            Show Aid Requests
+            Show Ongoing Aid Requests
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={showDeliveredAid}
+              onChange={() => setShowDeliveredAid(!showDeliveredAid)}
+            />
+            Show Delivered Aid
           </label>
         </div>
 
         <div className="w-full h-[600px] rounded-xl overflow-hidden shadow-lg">
           <DisasterMap
             approvedAidRequests={showAidRequests ? filtered : []}
+            deliveredAidRequests={showDeliveredAid ? deliveredAidRequests : []}
             approvedAlerts={showAlerts ? alerts : []}
           />
         </div>
       </section>
 
 
-      {/* Stats */}
+
+      {/* Stats*/ }
       <section className="py-20 bg-white" ref={statsRef}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -294,7 +319,7 @@ export default function Home() {
         </div>
       </section>
 
-     {/* Aid Table */}
+     {/* Aid Table*/ }
 <section className="w-full mt-12">
   <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
     <h2 className="text-2xl md:text-3xl font-bold mb-6 text-blue-800">Recent Aid Requests</h2>
@@ -372,7 +397,7 @@ export default function Home() {
 </section>
 
 
-     {/* Features Section with Modern Cards */}
+     {/* Features Section with Modern Cards*/ }
       <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">

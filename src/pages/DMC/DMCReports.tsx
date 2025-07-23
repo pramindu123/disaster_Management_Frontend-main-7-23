@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { aiVerificationService, type VerificationResult } from "../services/aiVerificationService";
 import { API_BASE_URL } from "../../api";
-import { aiVerificationService, VerificationResult } from "../services/aiVerificationService";
 
 export default function DMCReports() {
   const [reports, setReports] = useState<any[]>([]);
@@ -32,6 +32,7 @@ export default function DMCReports() {
 
       if (district) {
         fetch(`${API_BASE_URL}/Symptoms/pendingReportsByDistrict?district=${encodeURIComponent(district)}`)
+
           .then((res) => {
             if (!res.ok) {
               throw new Error(`Failed to fetch, status: ${res.status}`);
@@ -73,7 +74,7 @@ export default function DMCReports() {
     }));
 
     try {
-      // Use the real Gemini AI verification service
+      // Use the enhanced AI verification service
       const result = await aiVerificationService.verifyImageAuthenticity(imageUrl, description, {
         strictMode: false,
         minConfidenceThreshold: 0.6,
@@ -311,7 +312,7 @@ export default function DMCReports() {
                     <div className="mt-3">
                       <b>Detected Issues:</b>
                       <div className="flex flex-wrap gap-1 mt-1">
-                        {verificationResults[selected.report_id].flags.map((flag: string, index: number) => (
+                        {verificationResults[selected.report_id].flags.map((flag, index) => (
                           <span 
                             key={index}
                             className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded"
