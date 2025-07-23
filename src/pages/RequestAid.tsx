@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
+import { API_BASE_URL } from "../api";
 
 const supportOptions = ["First aid", "Supply distribution", "Other"];
 
@@ -204,7 +205,7 @@ export default function RequestAid() {
     };
 
     try {
-      const res = await fetch("http://localhost:5158/AidRequest/create", {
+      const res = await fetch(`${API_BASE_URL}/AidRequest/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -247,7 +248,7 @@ export default function RequestAid() {
   };
 
   try {
-    const res = await fetch("http://localhost:5158/AidRequest/create", {
+    const res = await fetch(`${API_BASE_URL}/AidRequest/create`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
