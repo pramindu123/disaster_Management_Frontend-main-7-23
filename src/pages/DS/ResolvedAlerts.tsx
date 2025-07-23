@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api"; 
 
 type Alert = {
   alert_id: number;
@@ -41,7 +42,7 @@ export default function OngoingAlerts() {
     setLoading(true);
     try {
       const res = await fetch(
-        `http://localhost:5158/Alerts/toResolve/${division}`
+        `${API_BASE_URL}/Alerts/toResolve/${division}`
       );
       if (!res.ok) throw new Error("Failed to fetch alerts");
       const data = await res.json();
@@ -61,7 +62,7 @@ export default function OngoingAlerts() {
   const handleResolvedChange = async (idx: number, alertId: number) => {
     try {
       const res = await fetch(
-        `http://localhost:5158/Alerts/resolve/${alertId}`,
+        `${API_BASE_URL}/Alerts/resolve/${alertId}`,
         {
           method: "PUT",
         }

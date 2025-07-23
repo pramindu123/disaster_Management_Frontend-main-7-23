@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { API_BASE_URL } from "../../api"; 
 
 type Report = {
   report_id: number;
@@ -48,7 +49,7 @@ export default function ReviewSymptomReports() {
     console.log("Divisional Secretariat used:", trimmedDivision);
 
     fetch(
-      `http://localhost:5158/Symptoms/pendingReports?divisionalSecretariat=${encodeURIComponent(
+      `${API_BASE_URL}/Symptoms/pendingReports?divisionalSecretariat=${encodeURIComponent(
         trimmedDivision
       )}`
     )
@@ -62,7 +63,7 @@ export default function ReviewSymptomReports() {
 
     try {
       const res = await fetch(
-        "http://localhost:5158/Symptoms/updateStatus",
+        `${API_BASE_URL}/Symptoms/updateStatus`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,7 +92,7 @@ export default function ReviewSymptomReports() {
       const trimmedDivision = divisionalSecretariat.trim();
 
       const refreshed = await fetch(
-        `http://localhost:5158/Symptoms/pendingReports?divisionalSecretariat=${encodeURIComponent(
+        `${API_BASE_URL}/Symptoms/pendingReports?divisionalSecretariat=${encodeURIComponent(
           trimmedDivision
         )}`
       );

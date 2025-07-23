@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api"; 
 
 export default function SubmitManualReport() {
   // Form state for inputs controlled by user
@@ -30,7 +31,7 @@ export default function SubmitManualReport() {
       console.log("🔍 Loading DS officer details for:", loginData);
 
       if (loginData.role === "DS" && loginData.userId) {
-        fetch(`http://localhost:5158/DSOfficer/details/${loginData.userId}`)
+        fetch(`${API_BASE_URL}/DSOfficer/details/${loginData.userId}`)
           .then((res) => {
             if (!res.ok) throw new Error("Failed to fetch DS Officer details");
             return res.json();
@@ -129,7 +130,7 @@ export default function SubmitManualReport() {
 
     try {
       setSubmitting(true);
-      const response = await fetch("http://localhost:5158/Symptoms/create", {
+      const response = await fetch(`${API_BASE_URL}/Symptoms/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import { API_BASE_URL } from "../../api"; 
 interface VolunteerContribution {
   contribution_id: number;
   volunteer_id: number;
@@ -31,7 +31,7 @@ export default function ApproveVolunteerContributions() {
 
         // ✅ Fetch pending contributions filtered by division
         const res = await fetch(
-          `http://localhost:5158/Contribution/pending?divisional_secretariat=${encodeURIComponent(
+          `${API_BASE_URL}/Contribution/pending?divisional_secretariat=${encodeURIComponent(
             divisional_secretariat
           )}`
         );
@@ -57,7 +57,7 @@ export default function ApproveVolunteerContributions() {
   ) => {
     try {
       const endpoint = action === "Approved" ? "approve" : "reject";
-      const url = `http://localhost:5158/Contribution/${endpoint}/${contributionId}`;
+      const url = `${API_BASE_URL}/Contribution/${endpoint}/${contributionId}`;
 
       const res = await fetch(url, { method: "POST" });
       if (!res.ok) throw new Error(`Failed to ${action.toLowerCase()} contribution`);

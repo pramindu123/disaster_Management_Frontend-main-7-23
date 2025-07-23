@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
+import { API_BASE_URL } from "../api"; 
 
 const disasterTypes = ["Flood", "Landslide", "Cyclone", "Drought", "Fire"];
 const severityTypes = ["High", "Medium", "Low"];
@@ -29,7 +30,7 @@ export default function Alerts() {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const response = await fetch("http://localhost:5158/Alerts/all");
+        const response = await fetch(`${API_BASE_URL}/Alerts/all`);
         const data = await response.json();
         setDisasters(data);
       } catch (error) {

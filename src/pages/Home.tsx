@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import districtGnDivisions from "../data/districtDivisionalSecretariats";
 import DisasterMap from "../components/DisasterMap";
+import { API_BASE_URL } from "../api";
 
 const rowsPerPage = 6;
 
@@ -117,7 +118,7 @@ export default function Home() {
   const fetchAidRequests = async () => {
     try {
       // Fetch ongoing aid requests (both emergency and post-disaster)
-      const res = await fetch("http://localhost:5158/AidRequest/ongoing");
+      const res = await fetch(`${API_BASE_URL}/AidRequest/ongoing`);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       const data = await res.json();
       setAidRequests(data);
@@ -132,7 +133,7 @@ export default function Home() {
   useEffect(() => {
     const fetchAlerts = async () => {
       try {
-        const res = await fetch("http://localhost:5158/Alerts/all");
+        const res = await fetch(`${API_BASE_URL}/Alerts/all`);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         const savedDistrict = localStorage.getItem("selectedDistrict");
@@ -148,9 +149,9 @@ export default function Home() {
     const fetchStats = async () => {
       try {
         const [vol, alerts, aid] = await Promise.all([
-          fetch("http://localhost:5158/active-volunteers-count"),
-          fetch("http://localhost:5158/alerts-sent-count"),
-          fetch("http://localhost:5158/total-aid-requests-count"),
+          fetch(`${API_BASE_URL}/active-volunteers-count`),
+          fetch(`${API_BASE_URL}/alerts-sent-count`),
+          fetch(`${API_BASE_URL}/total-aid-requests-count`),
         ]);
         if (!vol.ok || !alerts.ok || !aid.ok) throw new Error("Failed to fetch statistics");
         setActiveVolunteers((await vol.json()).count);

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../../api"; // Import the API base URL
 
 interface AddContributionProps {
   initialAidRequestId?: string;
@@ -61,7 +62,7 @@ export default function AddContribution(props: AddContributionProps) {
     };
 
     try {
-      const response = await fetch("http://localhost:5158/Contribution/add", {
+      const response = await fetch(`${API_BASE_URL}/Contribution/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

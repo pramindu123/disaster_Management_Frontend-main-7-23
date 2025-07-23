@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_BASE_URL } from "../../api"; // Import the API base URL
 
 interface AidRequest {
   aid_id: number;
@@ -34,7 +35,7 @@ export default function EmergencyAidRequest({ onBack, onAddContribution }: Emerg
 
         // ✅ Pass it as query param
         const response = await axios.get<AidRequest[]>(
-          `http://localhost:5158/Volunteer/emergency-support?volunteerId=${volunteerId}`
+          `${API_BASE_URL}/Volunteer/emergency-support?volunteerId=${volunteerId}`
         );
 
         setRequests(response.data);

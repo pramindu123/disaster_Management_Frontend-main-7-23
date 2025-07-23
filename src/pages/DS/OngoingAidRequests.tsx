@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api"; 
 
 interface OngoingAidRequest {
   aid_id: number;
@@ -33,7 +34,7 @@ const OngoingAidRequests: React.FC = () => {
         }
 
         const res = await fetch(
-          `http://localhost:5158/AidRequest/ongoing?divisionalSecretariat=${encodeURIComponent(
+          `${API_BASE_URL}/AidRequest/ongoing?divisionalSecretariat=${encodeURIComponent(
             divisionalSecretariat
           )}`
         );
@@ -43,7 +44,7 @@ const OngoingAidRequests: React.FC = () => {
         const requestsWithCounts = await Promise.all(
           ongoingRequests.map(async (req: any) => {
             const countRes = await fetch(
-              `http://localhost:5158/AidRequest/contribution-count/${req.aid_id}`
+              `${API_BASE_URL}/AidRequest/contribution-count/${req.aid_id}`
             );
             const countData = countRes.ok ? await countRes.json() : { contributionsReceived: 0 };
             return {
@@ -70,7 +71,7 @@ const OngoingAidRequests: React.FC = () => {
 
     try {
       const res = await fetch(
-        `http://localhost:5158/AidRequest/resolve/${aidId}`,
+        `${API_BASE_URL}/AidRequest/resolve/${aidId}`,
         { method: "POST" }
       );
 

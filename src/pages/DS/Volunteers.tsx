@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api";
 
 interface Volunteer {
   user_id: number;
@@ -36,7 +37,7 @@ export default function ViewVolunteers() {
 
       try {
         const response = await fetch(
-          `http://localhost:5158/Volunteer/by-division?divisionalSecretariat=${encodeURIComponent(
+          `${API_BASE_URL}/Volunteer/by-division?divisionalSecretariat=${encodeURIComponent(
             divisionalSecretariat
           )}`
         );

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import EmergencyAidRequest from "./EmergencyAidRequest";
 import PostDisasterAidRequestTable from "./PostDisasterAidRequestTable";
+import { API_BASE_URL } from "../../api";
 
 export default function AidRequests() {
   const navigate = useNavigate();

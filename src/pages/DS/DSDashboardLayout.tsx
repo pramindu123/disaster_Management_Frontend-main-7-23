@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../api"; 
 
 export default function DSDashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
