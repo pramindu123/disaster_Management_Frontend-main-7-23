@@ -137,6 +137,7 @@ export default function VolunteerDashboardLayout() {
 
         <hr className="border-gray-200 mb-4" />
         <nav className="flex flex-col gap-3 items-start mt-4 w-full">
+
           <NavLink
             to="/volunteer-dashboard"
             end
@@ -149,12 +150,11 @@ export default function VolunteerDashboardLayout() {
           >
             Dashboard
           </NavLink>
-
           <NavLink
-            to="my-contributions"
+            to="aid-requests"
             className="bg-white py-2 px-6 rounded-full text-left w-full hover:bg-blue-100"
           >
-            My Contributions
+            Aid Requests
           </NavLink>
           <NavLink
             to="add-contribution"
@@ -162,6 +162,13 @@ export default function VolunteerDashboardLayout() {
           >
             Add Contribution
           </NavLink>
+          <NavLink
+            to="my-contributions"
+            className="bg-white py-2 px-6 rounded-full text-left w-full hover:bg-blue-100"
+          >
+            My Contributions
+          </NavLink>
+          
           <NavLink
             to="settings"
             className="bg-white py-2 px-6 rounded-full text-left w-full hover:bg-blue-100"

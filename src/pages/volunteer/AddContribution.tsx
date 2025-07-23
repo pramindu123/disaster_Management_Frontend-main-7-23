@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { API_BASE_URL } from "../../api"; // Import the API base URL
+import { API_BASE_URL } from "../../api";
 
 interface AddContributionProps {
   initialAidRequestId?: string;
@@ -205,4 +205,3 @@ export default function AddContribution(props: AddContributionProps) {
     </div>
   );
 }
-
