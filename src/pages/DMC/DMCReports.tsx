@@ -1,49 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../api";
-
-// Define the VerificationResult interface locally to avoid import issues
-interface VerificationResult {
-  isVerifying: boolean;
-  isAuthentic: boolean | null;
-  confidence: number;
-  analysis: string;
-  matchScore: number;
-  flags: string[];
-}
-
-// Simple mock AI verification service
-const mockAiVerificationService = {
-  async verifyImageAuthenticity(
-    imageUrl: string, 
-    description: string, 
-    options?: any
-  ): Promise<VerificationResult> {
-    // Simulate AI verification process
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mockConfidence = Math.floor(Math.random() * 40) + 60; // 60-100%
-        const mockMatchScore = Math.floor(Math.random() * 30) + 70; // 70-100%
-        const isAuthentic = mockConfidence > 70;
-        
-        const flags: string[] = [];
-        if (!isAuthentic) {
-          flags.push('low_confidence', 'content_mismatch');
-        }
-        
-        resolve({
-          isVerifying: false,
-          isAuthentic,
-          confidence: mockConfidence,
-          analysis: isAuthentic 
-            ? "Image appears to be authentic based on content analysis."
-            : "Image shows signs of manipulation or inconsistencies.",
-          matchScore: mockMatchScore,
-          flags
-        });
-      }, 2000);
-    });
-  }
-};
+import { aiVerificationService, VerificationResult } from "../services/aiVerificationService";
 
 export default function DMCReports() {
   const [reports, setReports] = useState<any[]>([]);
@@ -116,8 +73,8 @@ export default function DMCReports() {
     }));
 
     try {
-      // Use the mock AI verification service
-      const result = await mockAiVerificationService.verifyImageAuthenticity(imageUrl, description, {
+      // Use the real Gemini AI verification service
+      const result = await aiVerificationService.verifyImageAuthenticity(imageUrl, description, {
         strictMode: false,
         minConfidenceThreshold: 0.6,
         checkMetadata: true,
