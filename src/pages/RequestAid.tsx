@@ -577,7 +577,7 @@ export default function RequestAid() {
           {/* Regular Aid Form (existing comprehensive form) */}
           {selectedOption === 'regular' && (
             <>
-              <div className="flex items-center mb-8">
+              <div className="flex items-center mb-12">
                 <button
                   onClick={() => setSelectedOption(null)}
                   className="mr-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
