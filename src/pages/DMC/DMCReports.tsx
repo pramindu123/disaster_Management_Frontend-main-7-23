@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../../api";
 
 // Define the VerificationResult interface locally to avoid import issues
 interface VerificationResult {
@@ -73,8 +74,7 @@ export default function DMCReports() {
       console.log("Using district:", district);
 
       if (district) {
-        fetch(`http://localhost:5158/Symptoms/pendingReportsByDistrict?district=${encodeURIComponent(district)}`)
-
+        fetch(`${API_BASE_URL}/Symptoms/pendingReportsByDistrict?district=${encodeURIComponent(district)}`)
           .then((res) => {
             if (!res.ok) {
               throw new Error(`Failed to fetch, status: ${res.status}`);
@@ -195,7 +195,7 @@ export default function DMCReports() {
     };
 
     try {
-      const response = await fetch("http://localhost:5158/Alerts/create", {
+      const response = await fetch(`${API_BASE_URL}/Alerts/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(alertData),
@@ -206,7 +206,7 @@ export default function DMCReports() {
         return;
       }
 
-      const statusResponse = await fetch("http://localhost:5158/Symptoms/updateStatus", {
+      const statusResponse = await fetch(`${API_BASE_URL}/Symptoms/updateStatus`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
