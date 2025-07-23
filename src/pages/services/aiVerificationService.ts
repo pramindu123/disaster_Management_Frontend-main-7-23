@@ -37,7 +37,7 @@ export interface GeminiResponse {
 // Real AI Service using Google Gemini Flash API
 export class ImageVerificationService {
   private static instance: ImageVerificationService;
-  private apiKey: string = process.env.REACT_APP_GEMINI_API_KEY || '';
+  private apiKey: string = 'AIzaSyByva4mPCX5a5y0pUsQqxYTCdrLzpL3ck8';
   private apiEndpoint: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
   static getInstance(): ImageVerificationService {
