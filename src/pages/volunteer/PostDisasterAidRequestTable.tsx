@@ -1,8 +1,13 @@
 import React, { useState } from "react";
-import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
+import districtDivisionalSecretariats from "../../data/districtDivisionalSecretariats";
 import { CheckCircle, MapPin } from "lucide-react";
 
-export default function PostDisasterAidRequest() {
+interface PostDisasterAidRequestTableProps {
+  onBack?: () => void;
+  onAddContribution?: (row: any) => void;
+}
+
+export default function PostDisasterAidRequest({ onBack, onAddContribution }: PostDisasterAidRequestTableProps = {}) {
   const [formData, setFormData] = useState({
     full_name: "",
     contact_no: "",
@@ -67,7 +72,7 @@ export default function PostDisasterAidRequest() {
           if (matchedDistrict) {
             const dsList = districtDivisionalSecretariats[matchedDistrict] || [];
             const matchedDS = dsList.find(
-              (ds) => ds.toLowerCase() === detectedDS.toLowerCase()
+              (ds: string) => ds.toLowerCase() === detectedDS.toLowerCase()
             );
 
             if (matchedDS) {
@@ -264,7 +269,7 @@ export default function PostDisasterAidRequest() {
                 className="w-full bg-gray-100 rounded-lg h-10 px-4 border border-gray-300"
               >
                 <option value="">Select Divisional Secretariat</option>
-                {dsDivisions.map((ds) => (
+                {dsDivisions.map((ds: string) => (
                   <option key={ds} value={ds}>
                     {ds}
                   </option>

@@ -44,7 +44,7 @@ export default function AidRequests() {
       ) : (
         <PostDisasterAidRequestTable
           onBack={() => setShowPostDisaster(false)}
-          onAddContribution={(row) => {
+          onAddContribution={(row: any) => {
             navigate("/volunteer-dashboard/add-contribution", {
               state: {
                 initialAidRequestId: row.aid_id?.toString() || "",
