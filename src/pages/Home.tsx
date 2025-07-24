@@ -235,7 +235,7 @@ export default function Home() {
               <div className="relative w-full max-w-lg">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur-lg opacity-30"></div>
                 <div className="relative bg-white p-2 rounded-2xl shadow-xl">
-                  <img src="home.png" alt="Hero" className="w-full h-72 object-cover rounded-2xl shadow-lg" />
+                  <img src="home_optimized.png" alt="Hero" className="w-full h-72 object-cover rounded-2xl shadow-lg" />
                 </div>
               </div>
             </div>
