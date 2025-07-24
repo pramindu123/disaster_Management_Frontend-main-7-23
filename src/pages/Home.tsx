@@ -239,9 +239,8 @@ export default function Home() {
                   className="flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-xl text-lg font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all duration-200 min-h-[64px]"
                 >
                   <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 2c-1 0-2 1-2 2v4l-6 4c-1 1-1 3 0 4l6 4v4c0 1 1 2 2 2s2-1 2-2v-4l6-4c1-1 1-3 0-4l-6-4V4c0-1-1-2-2-2z" />
-                    <circle cx="12" cy="12" r="3" fill="currentColor" />
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v4M10 12h4" stroke="white" strokeWidth="1" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v8M8 12h8" />
                   </svg>
                   Request Aid
                 </button>
