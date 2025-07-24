@@ -192,22 +192,22 @@ export default function RequestAid() {
         let errorMessage = "Unable to retrieve location";
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied by user";
+            errorMessage = "Location access denied by user. Please allow location access and try again.";
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable";
+            errorMessage = "Location information unavailable. Please check your GPS settings.";
             break;
           case error.TIMEOUT:
-            errorMessage = "Location request timed out";
+            errorMessage = "Location request is taking longer than expected. Please try again or select manually.";
             break;
         }
         setLocationError(errorMessage);
         setIsLoadingLocation(false);
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 600000 // 10 minutes
+        enableHighAccuracy: false, // Changed to false for faster response
+        timeout: 30000, // Increased to 30 seconds
+        maximumAge: 300000 // 5 minutes cache
       }
     );
   };
