@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
+import { districtCoordinates, divisionalSecretariatCoordinates, getDistrictDSCoordinates } from "../data/coordinates";
 import { API_BASE_URL } from "../api";
 
 export default function SubmitSymptoms() {
@@ -34,6 +35,55 @@ export default function SubmitSymptoms() {
     return !regex.test(phone) ? "Phone number must be exactly 10 digits" : "";
   };
 
+  // Calculate distance between two coordinates using Haversine formula
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in kilometers
+  };
+
+  // Find closest district and DS based on coordinates
+  const findClosestLocation = (userLat: number, userLng: number) => {
+    let closestDistrict = "";
+    let closestDS = "";
+    let minDistrictDistance = Infinity;
+    let minDSDistance = Infinity;
+
+    // Find closest district
+    Object.entries(districtCoordinates).forEach(([district, coords]) => {
+      const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
+      if (distance < minDistrictDistance) {
+        minDistrictDistance = distance;
+        closestDistrict = district;
+      }
+    });
+
+    // If we found a district, find the closest DS within that district
+    if (closestDistrict) {
+      const dsList = districtDivisionalSecretariats[closestDistrict] || [];
+      const dsCoordinates = getDistrictDSCoordinates(closestDistrict, dsList);
+      
+      Object.entries(dsCoordinates).forEach(([ds, coords]) => {
+        const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
+        if (distance < minDSDistance) {
+          minDSDistance = distance;
+          closestDS = ds;
+        }
+      });
+    }
+
+    console.log(`Closest district: ${closestDistrict} (${minDistrictDistance.toFixed(2)}km)`);
+    console.log(`Closest DS: ${closestDS} (${minDSDistance.toFixed(2)}km)`);
+
+    return { district: closestDistrict, ds: closestDS };
+  };
+
   const getCurrentLocation = () => {
     setIsLoadingLocation(true);
     setLocationError("");
@@ -50,76 +100,77 @@ export default function SubmitSymptoms() {
         setLatitude(latitude);
         setLongitude(longitude);
 
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-          );
-          const data = await response.json();
-          console.log("Reverse geocode data:", data);
+        console.log("User coordinates:", { latitude, longitude });
 
-          let detectedDistrict =
-            data.address.county || data.address.state_district || data.address.district || "";
-
-          if (detectedDistrict.toLowerCase().endsWith(" district")) {
-            detectedDistrict = detectedDistrict.slice(0, -9).trim();
+        // Use coordinate-based matching for exact location detection
+        const closestLocation = findClosestLocation(latitude, longitude);
+        
+        if (closestLocation.district) {
+          setSelectedDistrict(closestLocation.district);
+          if (closestLocation.ds) {
+            setSelectedDivisionalSecretariat(closestLocation.ds);
+          } else {
+            setSelectedDivisionalSecretariat("");
           }
+          setIsLocationAutoDetected(true);
+          console.log("Location auto-detected using coordinates:", closestLocation);
+        } else {
+          // Fallback to OpenStreetMap API if coordinate matching fails
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+            );
+            const data = await response.json();
+            console.log("Fallback - Reverse geocode data:", data);
 
-          const detectedDS =
-            data.address.suburb || 
-            data.address.village || 
-            data.address.town || 
-            data.address.hamlet || 
-            data.address.city || 
-            data.address.municipality || 
-            data.address.neighbourhood ||
-            data.address.locality || 
-            "";
+            let detectedDistrict =
+              data.address.county || data.address.state_district || data.address.district || "";
 
-          console.log("Detected district:", detectedDistrict);
-          console.log("Detected DS:", detectedDS);
-          console.log("Available districts:", districts);
+            if (detectedDistrict.toLowerCase().endsWith(" district")) {
+              detectedDistrict = detectedDistrict.slice(0, -9).trim();
+            }
 
-          const matchedDistrict = districts.find(
-            (d) => d.toLowerCase() === detectedDistrict.toLowerCase()
-          );
+            const detectedDS =
+              data.address.suburb || 
+              data.address.village || 
+              data.address.town || 
+              data.address.hamlet || 
+              data.address.city || 
+              data.address.municipality || 
+              data.address.neighbourhood ||
+              data.address.locality || 
+              "";
 
-          if (matchedDistrict) {
-            const dsList = districtDivisionalSecretariats[matchedDistrict] || [];
-            console.log("Available DS for district:", dsList);
-            
-            // First try exact match
-            let matchedDS = dsList.find(
-              (ds) => ds.toLowerCase() === detectedDS.toLowerCase()
+            const matchedDistrict = districts.find(
+              (d) => d.toLowerCase() === detectedDistrict.toLowerCase()
             );
 
-            // If no exact match, try partial match
-            if (!matchedDS && detectedDS) {
-              matchedDS = dsList.find(
-                (ds) => ds.toLowerCase().includes(detectedDS.toLowerCase()) ||
-                       detectedDS.toLowerCase().includes(ds.toLowerCase())
+            if (matchedDistrict) {
+              const dsList = districtDivisionalSecretariats[matchedDistrict] || [];
+              let matchedDS = dsList.find(
+                (ds) => ds.toLowerCase() === detectedDS.toLowerCase()
+              );
+
+              if (!matchedDS && detectedDS) {
+                matchedDS = dsList.find(
+                  (ds) => ds.toLowerCase().includes(detectedDS.toLowerCase()) ||
+                         detectedDS.toLowerCase().includes(ds.toLowerCase())
+                );
+              }
+
+              setSelectedDistrict(matchedDistrict);
+              setSelectedDivisionalSecretariat(matchedDS || "");
+              setIsLocationAutoDetected(true);
+              console.log("Fallback location detected:", { district: matchedDistrict, ds: matchedDS });
+            } else {
+              setLocationError(
+                `Could not determine location automatically. Please select manually.`
               );
             }
-
-            console.log("Matched DS:", matchedDS);
-
-            if (matchedDS) {
-              setSelectedDistrict(matchedDistrict);
-              setSelectedDivisionalSecretariat(matchedDS);
-              setIsLocationAutoDetected(true);
-            } else {
-              setSelectedDistrict(matchedDistrict);
-              setSelectedDivisionalSecretariat("");
-              setIsLocationAutoDetected(true);
-              console.log("DS not found, only district set");
-            }
-          } else {
-            setLocationError(
-              `Detected district '${detectedDistrict}' not found in options. Please select manually.`
-            );
+          } catch (error) {
+            setLocationError("Failed to detect location. Please select manually.");
+            console.error("Location detection error:", error);
           }
-        } catch (error) {
-          setLocationError("Failed to detect district and divisional secretariat from location.");
-          console.error(error);
         }
 
         setIsLoadingLocation(false);
