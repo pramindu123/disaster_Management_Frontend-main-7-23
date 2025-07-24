@@ -224,12 +224,26 @@ export default function Home() {
               <p className="text-xl md:text-2xl text-gray-600">
                 Empowering communities with real-time alerts, rapid response, and coordinated aid distribution.
               </p>
-              <button
-                onClick={handleLearnMore}
-                className="px-8 py-4 bg-white text-blue-600 border-2 border-blue-600 rounded-xl text-lg font-bold shadow hover:shadow-lg hover:-translate-y-1 transition"
-              >
-                Learn More
-              </button>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => window.location.href = '/submit-symptoms'}
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-red-600 text-white rounded-xl text-lg font-bold shadow-lg hover:shadow-xl hover:bg-red-700 hover:-translate-y-1 transition-all duration-200"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  Submit Alert
+                </button>
+                <button
+                  onClick={() => window.location.href = '/request-aid'}
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-xl text-lg font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all duration-200"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Request Aid
+                </button>
+              </div>
             </div>
             <div className="flex-1 flex justify-center">
               <div className="relative w-full max-w-lg">
