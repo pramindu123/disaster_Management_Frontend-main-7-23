@@ -199,7 +199,7 @@ export default function SubmitSymptoms() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20 px-4 md:px-12 font-sans flex items-center justify-center">
       <div className="w-full max-w-2xl mx-auto p-0 md:p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 transition-all duration-300">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">Submit Symptoms</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">Submit Disaster</h1>
           <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 rounded-r-lg">
             <div className="flex items-center">
               <svg className="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -479,7 +479,7 @@ export default function SubmitSymptoms() {
             <div className="fixed inset-0 flex items-center justify-center z-50">
               <div className="bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center animate-fadeIn">
                 <div className="text-green-600 text-3xl mb-4 font-bold">✔</div>
-                <div className="text-2xl font-semibold mb-4">Symptoms submitted successfully!</div>
+                <div className="text-2xl font-semibold mb-4">Disaster submitted successfully!</div>
                 <button className="mt-2 px-8 py-2 bg-blue-600 text-white rounded-lg font-bold text-lg hover:bg-blue-700 transition" onClick={() => setShowSuccess(false)}>OK</button>
               </div>
             </div>
