@@ -241,7 +241,7 @@ export default function Home() {
                   <img 
                     src="/aid_icon.jpg" 
                     alt="Aid Icon" 
-                    className="w-12 h-12 object-contain filter brightness-0 invert"
+                    className="w-16 h-16 object-contain filter brightness-0 invert"
                     style={{ filter: 'brightness(0) invert(1)' }}
                   />
                   Request Aid
