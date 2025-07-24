@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
+import { districtCoordinates, divisionalSecretariatCoordinates, getDistrictDSCoordinates } from "../data/coordinates";
 import { API_BASE_URL } from "../api";
 
 const supportOptions = ["First aid", "Supply distribution", "Other"];
@@ -44,52 +45,53 @@ export default function RequestAid() {
     return "";
   };
 
-  // GPS Location Service - Maps coordinates to districts/divisional secretariats
-  const getLocationFromCoordinates = (latitude: number, longitude: number): { district: string; divisionalSecretariat: string } => {
-    // Sri Lanka coordinate bounds and district mapping
-    // This is a simplified mapping - in a real application, you'd use a proper geocoding service
-    const locationMappings = [
-      { bounds: { minLat: 6.7, maxLat: 7.0, minLng: 79.8, maxLng: 80.2 }, district: "Colombo", divisionalSecretariat: "Colombo" },
-      { bounds: { minLat: 6.9, maxLat: 7.2, minLng: 79.9, maxLng: 80.3 }, district: "Gampaha", divisionalSecretariat: "Gampaha" },
-      { bounds: { minLat: 6.5, maxLat: 6.8, minLng: 79.8, maxLng: 80.2 }, district: "Kalutara", divisionalSecretariat: "Kalutara" },
-      { bounds: { minLat: 7.2, maxLat: 7.4, minLng: 80.5, maxLng: 80.8 }, district: "Kandy", divisionalSecretariat: "Kandy" },
-      { bounds: { minLat: 7.4, maxLat: 7.6, minLng: 80.5, maxLng: 80.8 }, district: "Matale", divisionalSecretariat: "Matale" },
-      { bounds: { minLat: 6.9, maxLat: 7.1, minLng: 80.7, maxLng: 81.0 }, district: "Nuwara Eliya", divisionalSecretariat: "Nuwara Eliya" },
-      { bounds: { minLat: 6.0, maxLat: 6.3, minLng: 80.1, maxLng: 80.4 }, district: "Galle", divisionalSecretariat: "Galle" },
-      { bounds: { minLat: 5.9, maxLat: 6.2, minLng: 80.5, maxLng: 80.8 }, district: "Matara", divisionalSecretariat: "Matara" },
-      { bounds: { minLat: 6.1, maxLat: 6.4, minLng: 81.0, maxLng: 81.3 }, district: "Hambantota", divisionalSecretariat: "Hambantota" },
-      { bounds: { minLat: 9.5, maxLat: 9.8, minLng: 80.0, maxLng: 80.3 }, district: "Jaffna", divisionalSecretariat: "Jaffna" },
-      { bounds: { minLat: 9.3, maxLat: 9.6, minLng: 80.3, maxLng: 80.6 }, district: "Kilinochchi", divisionalSecretariat: "Kilinochchi" },
-      { bounds: { minLat: 8.9, maxLat: 9.2, minLng: 79.9, maxLng: 80.2 }, district: "Mannar", divisionalSecretariat: "Mannar" },
-      { bounds: { minLat: 8.7, maxLat: 9.0, minLng: 80.4, maxLng: 80.7 }, district: "Vavuniya", divisionalSecretariat: "Vavuniya" },
-      { bounds: { minLat: 9.0, maxLat: 9.3, minLng: 80.7, maxLng: 81.0 }, district: "Mullaitivu", divisionalSecretariat: "Mullaitivu" },
-      { bounds: { minLat: 7.7, maxLat: 8.0, minLng: 81.6, maxLng: 81.9 }, district: "Batticaloa", divisionalSecretariat: "Batticaloa" },
-      { bounds: { minLat: 7.2, maxLat: 7.5, minLng: 81.6, maxLng: 81.9 }, district: "Ampara", divisionalSecretariat: "Ampara" },
-      { bounds: { minLat: 8.5, maxLat: 8.8, minLng: 81.1, maxLng: 81.4 }, district: "Trincomalee", divisionalSecretariat: "Trincomalee" },
-      { bounds: { minLat: 7.4, maxLat: 7.7, minLng: 80.3, maxLng: 80.6 }, district: "Kurunegala", divisionalSecretariat: "Kurunegala" },
-      { bounds: { minLat: 8.0, maxLat: 8.3, minLng: 79.8, maxLng: 80.1 }, district: "Puttalam", divisionalSecretariat: "Puttalam" },
-      { bounds: { minLat: 8.3, maxLat: 8.6, minLng: 80.3, maxLng: 80.6 }, district: "Anuradhapura", divisionalSecretariat: "Anuradhapura East" },
-      { bounds: { minLat: 7.9, maxLat: 8.2, minLng: 80.9, maxLng: 81.2 }, district: "Polonnaruwa", divisionalSecretariat: "Polonnaruwa" },
-      { bounds: { minLat: 6.9, maxLat: 7.2, minLng: 81.0, maxLng: 81.3 }, district: "Badulla", divisionalSecretariat: "Badulla" },
-      { bounds: { minLat: 6.8, maxLat: 7.1, minLng: 81.3, maxLng: 81.6 }, district: "Monaragala", divisionalSecretariat: "Monaragala" },
-      { bounds: { minLat: 6.6, maxLat: 6.9, minLng: 80.3, maxLng: 80.6 }, district: "Ratnapura", divisionalSecretariat: "Ratnapura" },
-      { bounds: { minLat: 7.2, maxLat: 7.5, minLng: 80.3, maxLng: 80.6 }, district: "Kegalle", divisionalSecretariat: "Kegalle" }
-    ];
+  // Calculate distance between two coordinates using Haversine formula
+  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = 
+      Math.sin(dLat/2) * Math.sin(dLat/2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+      Math.sin(dLng/2) * Math.sin(dLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c; // Distance in kilometers
+  };
 
-    for (const mapping of locationMappings) {
-      const { bounds, district, divisionalSecretariat } = mapping;
-      if (
-        latitude >= bounds.minLat &&
-        latitude <= bounds.maxLat &&
-        longitude >= bounds.minLng &&
-        longitude <= bounds.maxLng
-      ) {
-        return { district, divisionalSecretariat };
+  // Find closest district and DS based on coordinates
+  const findClosestLocation = (userLat: number, userLng: number) => {
+    let closestDistrict = "";
+    let closestDS = "";
+    let minDistrictDistance = Infinity;
+    let minDSDistance = Infinity;
+
+    // Find closest district
+    Object.entries(districtCoordinates).forEach(([district, coords]) => {
+      const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
+      if (distance < minDistrictDistance) {
+        minDistrictDistance = distance;
+        closestDistrict = district;
       }
+    });
+
+    // If we found a district, find the closest DS within that district
+    if (closestDistrict) {
+      const dsList = districtDivisionalSecretariats[closestDistrict] || [];
+      const dsCoordinates = getDistrictDSCoordinates(closestDistrict, dsList);
+      
+      Object.entries(dsCoordinates).forEach(([ds, coords]) => {
+        const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
+        if (distance < minDSDistance) {
+          minDSDistance = distance;
+          closestDS = ds;
+        }
+      });
     }
 
-    // Default fallback if no mapping found
-    return { district: "Colombo", divisionalSecretariat: "Colombo" };
+    console.log(`Closest district: ${closestDistrict} (${minDistrictDistance.toFixed(2)}km)`);
+    console.log(`Closest DS: ${closestDS} (${minDSDistance.toFixed(2)}km)`);
+
+    return { district: closestDistrict, ds: closestDS };
   };
 
   const getCurrentLocation = () => {
@@ -103,21 +105,88 @@ export default function RequestAid() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
-        const location = getLocationFromCoordinates(latitude, longitude);
-        
-        setSelectedDistrict(location.district);
-        setSelectedDivisionalSecretariat(location.divisionalSecretariat);
-        setIsLocationAutoDetected(true);
-        setIsLoadingLocation(false);
-         setFormData(prev => ({
-           ...prev,
-             latitude,
-             longitude
-      }));
+        setFormData(prev => ({
+          ...prev,
+          latitude,
+          longitude
+        }));
 
-      setIsLoadingLocation(false);
+        console.log("User coordinates:", { latitude, longitude });
+
+        // Use coordinate-based matching for exact location detection
+        const closestLocation = findClosestLocation(latitude, longitude);
+        
+        if (closestLocation.district) {
+          setSelectedDistrict(closestLocation.district);
+          if (closestLocation.ds) {
+            setSelectedDivisionalSecretariat(closestLocation.ds);
+          } else {
+            setSelectedDivisionalSecretariat("");
+          }
+          setIsLocationAutoDetected(true);
+          console.log("Location auto-detected using coordinates:", closestLocation);
+        } else {
+          // Fallback to OpenStreetMap API if coordinate matching fails
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+            );
+            const data = await response.json();
+            console.log("Fallback - Reverse geocode data:", data);
+
+            let detectedDistrict =
+              data.address.county || data.address.state_district || data.address.district || "";
+
+            if (detectedDistrict.toLowerCase().endsWith(" district")) {
+              detectedDistrict = detectedDistrict.slice(0, -9).trim();
+            }
+
+            const detectedDS =
+              data.address.suburb || 
+              data.address.village || 
+              data.address.town || 
+              data.address.hamlet || 
+              data.address.city || 
+              data.address.municipality || 
+              data.address.neighbourhood ||
+              data.address.locality || 
+              "";
+
+            const matchedDistrict = districts.find(
+              (d) => d.toLowerCase() === detectedDistrict.toLowerCase()
+            );
+
+            if (matchedDistrict) {
+              const dsList = districtDivisionalSecretariats[matchedDistrict] || [];
+              let matchedDS = dsList.find(
+                (ds) => ds.toLowerCase() === detectedDS.toLowerCase()
+              );
+
+              if (!matchedDS && detectedDS) {
+                matchedDS = dsList.find(
+                  (ds) => ds.toLowerCase().includes(detectedDS.toLowerCase()) ||
+                         detectedDS.toLowerCase().includes(ds.toLowerCase())
+                );
+              }
+
+              setSelectedDistrict(matchedDistrict);
+              setSelectedDivisionalSecretariat(matchedDS || "");
+              setIsLocationAutoDetected(true);
+              console.log("Fallback location detected:", { district: matchedDistrict, ds: matchedDS });
+            } else {
+              setLocationError(
+                `Could not determine location automatically. Please select manually.`
+              );
+            }
+          } catch (error) {
+            setLocationError("Failed to detect location. Please select manually.");
+            console.error("Location detection error:", error);
+          }
+        }
+
+        setIsLoadingLocation(false);
       },
       (error) => {
         let errorMessage = "Unable to retrieve location";
