@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import districtGnDivisions from "../data/districtDivisionalSecretariats";
 import { CheckCircle, MapPin } from "lucide-react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
 import { API_BASE_URL } from "../api";

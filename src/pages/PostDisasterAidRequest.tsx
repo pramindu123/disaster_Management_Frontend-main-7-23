@@ -168,7 +168,7 @@ export default function PostDisasterAidRequest() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20 px-4 md:px-12 flex items-center justify-center font-sans">
       <div className="w-full max-w-2xl mx-auto p-0 md:p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 transition-all duration-300">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-12">
             Post Disaster Aid Request
           </h1>
 
