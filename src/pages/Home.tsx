@@ -227,21 +227,21 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <button
                   onClick={() => window.location.href = '/submit-symptoms'}
-                  className="flex items-center justify-center gap-3 px-8 py-4 bg-red-600 text-white rounded-xl text-lg font-bold shadow-lg hover:shadow-xl hover:bg-red-700 hover:-translate-y-1 transition-all duration-200"
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-red-600 text-white rounded-xl text-lg font-bold shadow-lg hover:shadow-xl hover:bg-red-700 hover:-translate-y-1 transition-all duration-200 min-h-[64px]"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
                   Submit Alert
                 </button>
                 <button
                   onClick={() => window.location.href = '/request-aid'}
-                  className="flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-xl text-lg font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all duration-200"
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-xl text-lg font-bold shadow-lg hover:shadow-xl hover:bg-blue-700 hover:-translate-y-1 transition-all duration-200 min-h-[64px]"
                 >
                   <img 
                     src="/aid_icon.jpg" 
                     alt="Aid Icon" 
-                    className="w-16 h-16 object-contain filter brightness-0 invert"
+                    className="w-8 h-8 object-contain filter brightness-0 invert"
                     style={{ filter: 'brightness(0) invert(1)' }}
                   />
                   Request Aid
