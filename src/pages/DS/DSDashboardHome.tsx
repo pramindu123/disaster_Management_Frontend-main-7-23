@@ -1,11 +1,18 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../api";
 
 export default function DSDashboardHome() {
   const [dsOfficer, setDsOfficer] = useState({
     fullName: "",
     divisionalSecretariat: "",
   });
+
   const [currentDate, setCurrentDate] = useState("");
+  const [pendingAidCount, setPendingAidCount] = useState<number>(0);
+  const [pendingContributionsCount, setPendingContributionsCount] = useState<number>(0);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedData = localStorage.getItem("dsOfficerData");
@@ -26,6 +33,53 @@ export default function DSDashboardHome() {
     setCurrentDate(formattedDate);
   }, []);
 
+  useEffect(() => {
+    const fetchCounts = async () => {
+      if (!dsOfficer.divisionalSecretariat) return;
+
+      try {
+        // ✅ Get pending aid requests count
+        const aidRes = await fetch(
+          `${API_BASE_URL}/AidRequest/pending-post-disaster/count?divisionalSecretariat=${encodeURIComponent(
+            dsOfficer.divisionalSecretariat
+          )}`
+        );
+        if (aidRes.ok) {
+          const aidData = await aidRes.json();
+          setPendingAidCount(aidData.pendingCount || 0);
+        } else {
+          console.error("Failed to fetch pending aid count");
+        }
+
+        // ✅ Get pending volunteer contributions count
+        const contributionRes = await fetch(
+          `${API_BASE_URL}/Contribution/pending/count?divisional_secretariat=${encodeURIComponent(
+            dsOfficer.divisionalSecretariat
+          )}`
+        );
+        if (contributionRes.ok) {
+          const contributionData = await contributionRes.json();
+          setPendingContributionsCount(contributionData.pendingCount || 0);
+        } else {
+          console.error("Failed to fetch pending contributions count");
+        }
+      } catch (error) {
+        console.error("Error fetching counts:", error);
+      }
+    };
+
+    fetchCounts();
+  }, [dsOfficer.divisionalSecretariat]);
+
+  // ✅ Handlers for navigation
+  const handleNavigateToApproveAid = () => {
+    navigate("/ds-dashboard/approve-aid-requests");
+  };
+
+  const handleNavigateToApproveContributions = () => {
+    navigate("/ds-dashboard/approve-volunteer-contributions");
+  };
+
   return (
     <div className="w-full flex flex-col items-center">
       <h1 className="font-extrabold text-2xl sm:text-4xl md:text-5xl lg:text-6xl mb-6 text-center">
@@ -36,23 +90,32 @@ export default function DSDashboardHome() {
       </div>
 
       <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-        <div className="rounded-2xl bg-gray-200 shadow p-8 flex flex-col items-center w-full">
+        {/* ✅ Pending Volunteer Contributions card */}
+        <div
+          className="rounded-2xl bg-gray-200 shadow p-8 flex flex-col items-center w-full cursor-pointer hover:bg-gray-300 transition"
+          onClick={handleNavigateToApproveContributions}
+        >
           <span className="text-xl md:text-2xl text-gray-700 text-center mb-2">
-            Total Pending Reports
+            Pending Volunteer Contributions
           </span>
           <span className="text-3xl md:text-5xl font-extrabold text-gray-900 text-center">
-            2
+            {pendingContributionsCount}
           </span>
           <span className="mt-2 text-base md:text-lg text-gray-700 text-center">
-            Review Reports
+            Review Contributions
           </span>
         </div>
-        <div className="rounded-2xl bg-gray-200 shadow p-8 flex flex-col items-center w-full">
+
+        {/* ✅ Pending Aid Requests card */}
+        <div
+          className="rounded-2xl bg-gray-200 shadow p-8 flex flex-col items-center w-full cursor-pointer hover:bg-gray-300 transition"
+          onClick={handleNavigateToApproveAid}
+        >
           <span className="text-xl md:text-2xl text-gray-700 text-center mb-2">
             Pending Aid Requests
           </span>
           <span className="text-3xl md:text-5xl font-extrabold text-gray-900 text-center">
-            3
+            {pendingAidCount}
           </span>
           <span className="mt-2 text-base md:text-lg text-gray-700 text-center">
             Approve Aid

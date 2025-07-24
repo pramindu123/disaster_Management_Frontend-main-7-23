@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from "react";
-import { API_BASE_URL } from "../../api"; // Import the API base URL
+import { API_BASE_URL } from "../../api";
 
 type Contribution = {
   district: string;

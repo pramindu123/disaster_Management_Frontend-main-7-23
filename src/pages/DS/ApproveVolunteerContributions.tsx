@@ -6,7 +6,7 @@ interface VolunteerContribution {
   volunteer_id: number;
   volunteer_name: string;
   volunteer_contact: string;
-  type_of_support: string;
+  type_support: string;
   description: string;
   image: string;
   status: "Pending" | "Approved" | "Rejected";
@@ -115,13 +115,13 @@ export default function ApproveVolunteerContributions() {
                   </div>
                   <div>
                     <span className="font-semibold">Type of Support:</span>
-                    <span className="ml-2">{c.type_of_support}</span>
+                    <span className="ml-2">{c.type_support}</span>
                   </div>
                 </div>
                 <div>
                   <img
                     src={c.image}
-                    alt={c.type_of_support}
+                    alt={c.type_support}
                     className="w-24 h-24 object-cover rounded border"
                   />
                 </div>
