@@ -65,7 +65,19 @@ export default function SubmitSymptoms() {
           }
 
           const detectedDS =
-            data.address.suburb || data.address.village || data.address.town || data.address.hamlet || "";
+            data.address.suburb || 
+            data.address.village || 
+            data.address.town || 
+            data.address.hamlet || 
+            data.address.city || 
+            data.address.municipality || 
+            data.address.neighbourhood ||
+            data.address.locality || 
+            "";
+
+          console.log("Detected district:", detectedDistrict);
+          console.log("Detected DS:", detectedDS);
+          console.log("Available districts:", districts);
 
           const matchedDistrict = districts.find(
             (d) => d.toLowerCase() === detectedDistrict.toLowerCase()
@@ -73,9 +85,22 @@ export default function SubmitSymptoms() {
 
           if (matchedDistrict) {
             const dsList = districtDivisionalSecretariats[matchedDistrict] || [];
-            const matchedDS = dsList.find(
+            console.log("Available DS for district:", dsList);
+            
+            // First try exact match
+            let matchedDS = dsList.find(
               (ds) => ds.toLowerCase() === detectedDS.toLowerCase()
             );
+
+            // If no exact match, try partial match
+            if (!matchedDS && detectedDS) {
+              matchedDS = dsList.find(
+                (ds) => ds.toLowerCase().includes(detectedDS.toLowerCase()) ||
+                       detectedDS.toLowerCase().includes(ds.toLowerCase())
+              );
+            }
+
+            console.log("Matched DS:", matchedDS);
 
             if (matchedDS) {
               setSelectedDistrict(matchedDistrict);
@@ -85,6 +110,7 @@ export default function SubmitSymptoms() {
               setSelectedDistrict(matchedDistrict);
               setSelectedDivisionalSecretariat("");
               setIsLocationAutoDetected(true);
+              console.log("DS not found, only district set");
             }
           } else {
             setLocationError(
