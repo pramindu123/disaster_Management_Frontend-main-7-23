@@ -90,8 +90,8 @@ const Navbar = () => {
         }`}
         style={{ backgroundColor: 'white' }}
       >
-        <div className="flex flex-col h-full">
-          <div className="flex justify-end p-4">
+        <div className="flex flex-col h-full bg-white">
+          <div className="flex justify-end p-4 bg-white">
             <button
               onClick={() => setIsOpen(false)}
               className="p-2 rounded-md text-gray-600 hover:text-blue-600 focus:outline-none"
@@ -100,7 +100,7 @@ const Navbar = () => {
             </button>
           </div>
           
-          <div className="flex flex-col px-4 space-y-4">
+          <div className="flex flex-col px-4 space-y-4 bg-white">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
