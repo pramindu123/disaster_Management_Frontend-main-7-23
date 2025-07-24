@@ -151,20 +151,6 @@ export default function EmergencyAidRequest() {
             Emergency Aid Request
           </h1>
 
-          <div className="bg-red-50 border border-red-300 p-4 rounded-lg mb-4 text-red-800">
-            <strong>Emergency Request:</strong> Click <strong>"Use GPS"</strong> to auto-detect your district. Select GN manually if needed.
-          </div>
-
-          <div className="bg-green-50 border border-green-300 p-4 rounded-lg mb-6 flex items-center gap-2 text-green-700">
-            <CheckCircle className="w-5 h-5" />
-            <span>
-              Location detected:{" "}
-              {location.latitude && location.longitude
-                ? `Latitude: ${location.latitude.toFixed(5)}, Longitude: ${location.longitude.toFixed(5)}`
-                : "No location detected"}
-            </span>
-          </div>
-
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block font-semibold mb-1">Full Name</label>
