@@ -67,11 +67,16 @@ export default function Login() {
         navigate("/dmc-dashboard");
       } else if (data.role.toLowerCase() === "volunteer") {
         localStorage.setItem(
-          "volunteerData",
-          JSON.stringify(normalizedData)
-        );
-        navigate("/volunteer-dashboard");
-      }
+             "volunteerData",
+             JSON.stringify(normalizedData)
+           );
+          localStorage.setItem(
+          "volunteerId",
+           normalizedData.userId.toString()
+  );
+  navigate("/volunteer-dashboard");
+}
+
     } catch (error) {
       console.error("Login error:", error);
       alert("An error occurred during login. Please try again.");

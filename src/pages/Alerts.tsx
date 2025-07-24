@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
-import { API_BASE_URL } from "../api"; 
+import { API_BASE_URL } from "../api";
 
 const disasterTypes = ["Flood", "Landslide", "Cyclone", "Drought", "Fire"];
 const severityTypes = ["High", "Medium", "Low"];

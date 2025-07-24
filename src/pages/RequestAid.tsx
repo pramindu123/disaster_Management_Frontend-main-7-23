@@ -369,6 +369,17 @@ export default function RequestAid() {
                 </button>
                 <h1 className="text-3xl md:text-4xl font-bold text-red-700">Emergency Aid Request</h1>
               </div>
+              
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-8 rounded-r-lg">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-red-700 text-sm md:text-base">
+                    <strong>Emergency Request:</strong> Your GPS location is being automatically detected. You can manually select your district and divisional secretariat if the auto-detected location is incorrect.
+                  </p>
+                </div>
+              </div>
 
               {/* Auto GPS Detection Status */}
               {isLoadingLocation && (
@@ -498,7 +509,7 @@ export default function RequestAid() {
                               <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            Use GPS
+                            Current Location
                           </>
                         )}
                       </button>
@@ -577,7 +588,7 @@ export default function RequestAid() {
           {/* Regular Aid Form (existing comprehensive form) */}
           {selectedOption === 'regular' && (
             <>
-              <div className="flex items-center mb-12">
+              <div className="flex items-center mb-4">
                 <button
                   onClick={() => setSelectedOption(null)}
                   className="mr-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -588,6 +599,16 @@ export default function RequestAid() {
                 </button>
                 <h1 className="text-3xl md:text-4xl font-bold">Post Disaster Aid Request</h1>
               </div>
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 rounded-r-lg">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-blue-700 text-sm md:text-base">
+                <strong>Location Detection:</strong> Use "Use GPS" to auto-detect your location, or manually select your district and divisional secretariat. You can change auto-detected locations if they're incorrect.
+              </p>
+            </div>
+          </div>
           <form ref={formRef} className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
             {/* Full Name */}
             <div className="flex flex-col gap-1 md:flex-row md:items-center">
@@ -676,7 +697,7 @@ export default function RequestAid() {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
-                        Use GPS
+                        Current Location
                       </>
                     )}
                   </button>
