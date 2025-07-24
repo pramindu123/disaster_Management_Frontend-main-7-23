@@ -200,7 +200,6 @@ export default function SubmitSymptoms() {
       <div className="w-full max-w-2xl mx-auto p-0 md:p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 transition-all duration-300">
           <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">Submit Disaster</h1>
-          </div>
           <form ref={formRef} className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
             {/* Full Name */}
             <div className="flex flex-col gap-1 md:flex-row md:items-center">
