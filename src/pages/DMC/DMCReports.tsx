@@ -11,6 +11,7 @@ export default function DMCReports() {
     district: "",
     divisionalSecretariat: "",
     alertType: "",
+    customAlertType: "",
     severity: "Medium",
     latitude: 0,
     longitude: 0,
@@ -109,6 +110,7 @@ export default function DMCReports() {
       district: report.district,
       divisionalSecretariat: report.divisional_secretariat,
       alertType: "",
+      customAlertType: "",
       severity: "Medium",
       latitude: report.latitude,
       longitude: report.longitude,
@@ -135,6 +137,7 @@ export default function DMCReports() {
       district: "",
       divisionalSecretariat: "",
       alertType: "",
+      customAlertType: "",
       severity: "Medium",
       latitude: 0,
       longitude: 0,
@@ -147,7 +150,7 @@ export default function DMCReports() {
     e.preventDefault();
 
     const alertData = {
-      alert_type: alertForm.alertType,
+      alert_type: alertForm.alertType === "Other" ? alertForm.customAlertType : alertForm.alertType,
       district: alertForm.district,
       divisional_secretariat: alertForm.divisionalSecretariat,
       severity: alertForm.severity,
@@ -467,8 +470,8 @@ export default function DMCReports() {
                   type="text"
                   name="customAlertType"
                   placeholder="Please specify the alert type..."
-                  value=""
-                  onChange={(e) => setAlertForm(prev => ({ ...prev, alertType: e.target.value }))}
+                  value={alertForm.customAlertType}
+                  onChange={(e) => setAlertForm(prev => ({ ...prev, customAlertType: e.target.value }))}
                   className="w-full rounded px-3 py-2 border border-gray-300 mt-2"
                   required
                 />
