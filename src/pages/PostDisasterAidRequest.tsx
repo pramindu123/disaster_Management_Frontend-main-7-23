@@ -130,9 +130,19 @@ export default function PostDisasterAidRequest() {
       return;
     }
 
-    // Validate coordinates
+    // Debug the current location state
+    console.log("Current location state before validation:", location);
+    console.log("FormData state:", formData);
+
+    // Validate coordinates - simplified validation
     if (!location.latitude || !location.longitude) {
       alert("Please select a location or use GPS to get your current location.");
+      console.log("Coordinate validation failed - missing coordinates:", {
+        latitude: location.latitude,
+        longitude: location.longitude,
+        hasDistrict: !!formData.district,
+        hasDS: !!formData.ds_division
+      });
       return;
     }
 
@@ -250,6 +260,7 @@ export default function PostDisasterAidRequest() {
                     // Get coordinates for manually selected district (only if no DS is selected)
                     if (selectedDistrict && districtCoordinates[selectedDistrict]) {
                       const coords = districtCoordinates[selectedDistrict];
+                      console.log("Setting district coordinates:", coords);
                       setLocation((prev) => ({
                         ...prev,
                         district: selectedDistrict,
@@ -258,6 +269,7 @@ export default function PostDisasterAidRequest() {
                         longitude: coords.lng,
                       }));
                     } else {
+                      console.log("Clearing coordinates for district:", selectedDistrict);
                       setLocation((prev) => ({
                         ...prev,
                         district: selectedDistrict,
@@ -299,6 +311,7 @@ export default function PostDisasterAidRequest() {
                   // Get coordinates for manually selected divisional secretariat (highest priority)
                   if (selectedDS && divisionalSecretariatCoordinates[selectedDS]) {
                     const coords = divisionalSecretariatCoordinates[selectedDS];
+                    console.log("Setting DS coordinates:", coords);
                     setLocation((prev) => ({
                       ...prev,
                       ds: selectedDS,
@@ -308,12 +321,15 @@ export default function PostDisasterAidRequest() {
                   } else if (formData.district && districtCoordinates[formData.district]) {
                     // Fall back to district coordinates if DS is cleared
                     const coords = districtCoordinates[formData.district];
+                    console.log("Falling back to district coordinates:", coords);
                     setLocation((prev) => ({
                       ...prev,
                       ds: selectedDS,
                       latitude: coords.lat,
                       longitude: coords.lng,
                     }));
+                  } else {
+                    console.log("No coordinates available for DS:", selectedDS);
                   }
                 }}
                 disabled={!formData.district}
