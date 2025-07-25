@@ -1,6 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
-import { districtCoordinates, divisionalSecretariatCoordinates, getDistrictDSCoordinates } from "../data/coordinates";
 import { API_BASE_URL } from "../api";
 
 const supportOptions = ["First aid", "Supply distribution", "Other"];
@@ -10,6 +9,7 @@ export default function RequestAid() {
   const [formData, setFormData] = useState({
     full_name: "",
     contact_no: "",
+    nic_number: "",
     family_size: 1,
     date_time: "",
     description: "",
@@ -45,53 +45,52 @@ export default function RequestAid() {
     return "";
   };
 
-  // Calculate distance between two coordinates using Haversine formula
-  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
-    const R = 6371; // Radius of the Earth in kilometers
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLng = (lng2 - lng1) * Math.PI / 180;
-    const a = 
-      Math.sin(dLat/2) * Math.sin(dLat/2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      Math.sin(dLng/2) * Math.sin(dLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return R * c; // Distance in kilometers
-  };
+  // GPS Location Service - Maps coordinates to districts/divisional secretariats
+  const getLocationFromCoordinates = (latitude: number, longitude: number): { district: string; divisionalSecretariat: string } => {
+    // Sri Lanka coordinate bounds and district mapping
+    // This is a simplified mapping - in a real application, you'd use a proper geocoding service
+    const locationMappings = [
+      { bounds: { minLat: 6.7, maxLat: 7.0, minLng: 79.8, maxLng: 80.2 }, district: "Colombo", divisionalSecretariat: "Colombo" },
+      { bounds: { minLat: 6.9, maxLat: 7.2, minLng: 79.9, maxLng: 80.3 }, district: "Gampaha", divisionalSecretariat: "Gampaha" },
+      { bounds: { minLat: 6.5, maxLat: 6.8, minLng: 79.8, maxLng: 80.2 }, district: "Kalutara", divisionalSecretariat: "Kalutara" },
+      { bounds: { minLat: 7.2, maxLat: 7.4, minLng: 80.5, maxLng: 80.8 }, district: "Kandy", divisionalSecretariat: "Kandy" },
+      { bounds: { minLat: 7.4, maxLat: 7.6, minLng: 80.5, maxLng: 80.8 }, district: "Matale", divisionalSecretariat: "Matale" },
+      { bounds: { minLat: 6.9, maxLat: 7.1, minLng: 80.7, maxLng: 81.0 }, district: "Nuwara Eliya", divisionalSecretariat: "Nuwara Eliya" },
+      { bounds: { minLat: 6.0, maxLat: 6.3, minLng: 80.1, maxLng: 80.4 }, district: "Galle", divisionalSecretariat: "Galle" },
+      { bounds: { minLat: 5.9, maxLat: 6.2, minLng: 80.5, maxLng: 80.8 }, district: "Matara", divisionalSecretariat: "Matara" },
+      { bounds: { minLat: 6.1, maxLat: 6.4, minLng: 81.0, maxLng: 81.3 }, district: "Hambantota", divisionalSecretariat: "Hambantota" },
+      { bounds: { minLat: 9.5, maxLat: 9.8, minLng: 80.0, maxLng: 80.3 }, district: "Jaffna", divisionalSecretariat: "Jaffna" },
+      { bounds: { minLat: 9.3, maxLat: 9.6, minLng: 80.3, maxLng: 80.6 }, district: "Kilinochchi", divisionalSecretariat: "Kilinochchi" },
+      { bounds: { minLat: 8.9, maxLat: 9.2, minLng: 79.9, maxLng: 80.2 }, district: "Mannar", divisionalSecretariat: "Mannar" },
+      { bounds: { minLat: 8.7, maxLat: 9.0, minLng: 80.4, maxLng: 80.7 }, district: "Vavuniya", divisionalSecretariat: "Vavuniya" },
+      { bounds: { minLat: 9.0, maxLat: 9.3, minLng: 80.7, maxLng: 81.0 }, district: "Mullaitivu", divisionalSecretariat: "Mullaitivu" },
+      { bounds: { minLat: 7.7, maxLat: 8.0, minLng: 81.6, maxLng: 81.9 }, district: "Batticaloa", divisionalSecretariat: "Batticaloa" },
+      { bounds: { minLat: 7.2, maxLat: 7.5, minLng: 81.6, maxLng: 81.9 }, district: "Ampara", divisionalSecretariat: "Ampara" },
+      { bounds: { minLat: 8.5, maxLat: 8.8, minLng: 81.1, maxLng: 81.4 }, district: "Trincomalee", divisionalSecretariat: "Trincomalee" },
+      { bounds: { minLat: 7.4, maxLat: 7.7, minLng: 80.3, maxLng: 80.6 }, district: "Kurunegala", divisionalSecretariat: "Kurunegala" },
+      { bounds: { minLat: 8.0, maxLat: 8.3, minLng: 79.8, maxLng: 80.1 }, district: "Puttalam", divisionalSecretariat: "Puttalam" },
+      { bounds: { minLat: 8.3, maxLat: 8.6, minLng: 80.3, maxLng: 80.6 }, district: "Anuradhapura", divisionalSecretariat: "Anuradhapura East" },
+      { bounds: { minLat: 7.9, maxLat: 8.2, minLng: 80.9, maxLng: 81.2 }, district: "Polonnaruwa", divisionalSecretariat: "Polonnaruwa" },
+      { bounds: { minLat: 6.9, maxLat: 7.2, minLng: 81.0, maxLng: 81.3 }, district: "Badulla", divisionalSecretariat: "Badulla" },
+      { bounds: { minLat: 6.8, maxLat: 7.1, minLng: 81.3, maxLng: 81.6 }, district: "Monaragala", divisionalSecretariat: "Monaragala" },
+      { bounds: { minLat: 6.6, maxLat: 6.9, minLng: 80.3, maxLng: 80.6 }, district: "Ratnapura", divisionalSecretariat: "Ratnapura" },
+      { bounds: { minLat: 7.2, maxLat: 7.5, minLng: 80.3, maxLng: 80.6 }, district: "Kegalle", divisionalSecretariat: "Kegalle" }
+    ];
 
-  // Find closest district and DS based on coordinates
-  const findClosestLocation = (userLat: number, userLng: number) => {
-    let closestDistrict = "";
-    let closestDS = "";
-    let minDistrictDistance = Infinity;
-    let minDSDistance = Infinity;
-
-    // Find closest district
-    Object.entries(districtCoordinates).forEach(([district, coords]) => {
-      const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
-      if (distance < minDistrictDistance) {
-        minDistrictDistance = distance;
-        closestDistrict = district;
+    for (const mapping of locationMappings) {
+      const { bounds, district, divisionalSecretariat } = mapping;
+      if (
+        latitude >= bounds.minLat &&
+        latitude <= bounds.maxLat &&
+        longitude >= bounds.minLng &&
+        longitude <= bounds.maxLng
+      ) {
+        return { district, divisionalSecretariat };
       }
-    });
-
-    // If we found a district, find the closest DS within that district
-    if (closestDistrict) {
-      const dsList = districtDivisionalSecretariats[closestDistrict] || [];
-      const dsCoordinates = getDistrictDSCoordinates(closestDistrict, dsList);
-      
-      Object.entries(dsCoordinates).forEach(([ds, coords]) => {
-        const distance = calculateDistance(userLat, userLng, coords.lat, coords.lng);
-        if (distance < minDSDistance) {
-          minDSDistance = distance;
-          closestDS = ds;
-        }
-      });
     }
 
-    console.log(`Closest district: ${closestDistrict} (${minDistrictDistance.toFixed(2)}km)`);
-    console.log(`Closest DS: ${closestDS} (${minDSDistance.toFixed(2)}km)`);
-
-    return { district: closestDistrict, ds: closestDS };
+    // Default fallback if no mapping found
+    return { district: "Colombo", divisionalSecretariat: "Colombo" };
   };
 
   const getCurrentLocation = () => {
@@ -105,109 +104,42 @@ export default function RequestAid() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      async (position) => {
+      (position) => {
         const { latitude, longitude } = position.coords;
-        setFormData(prev => ({
-          ...prev,
-          latitude,
-          longitude
-        }));
-
-        console.log("User coordinates:", { latitude, longitude });
-
-        // Use coordinate-based matching for exact location detection
-        const closestLocation = findClosestLocation(latitude, longitude);
+        const location = getLocationFromCoordinates(latitude, longitude);
         
-        if (closestLocation.district) {
-          setSelectedDistrict(closestLocation.district);
-          if (closestLocation.ds) {
-            setSelectedDivisionalSecretariat(closestLocation.ds);
-          } else {
-            setSelectedDivisionalSecretariat("");
-          }
-          setIsLocationAutoDetected(true);
-          console.log("Location auto-detected using coordinates:", closestLocation);
-        } else {
-          // Fallback to OpenStreetMap API if coordinate matching fails
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
-            );
-            const data = await response.json();
-            console.log("Fallback - Reverse geocode data:", data);
-
-            let detectedDistrict =
-              data.address.county || data.address.state_district || data.address.district || "";
-
-            if (detectedDistrict.toLowerCase().endsWith(" district")) {
-              detectedDistrict = detectedDistrict.slice(0, -9).trim();
-            }
-
-            const detectedDS =
-              data.address.suburb || 
-              data.address.village || 
-              data.address.town || 
-              data.address.hamlet || 
-              data.address.city || 
-              data.address.municipality || 
-              data.address.neighbourhood ||
-              data.address.locality || 
-              "";
-
-            const matchedDistrict = districts.find(
-              (d) => d.toLowerCase() === detectedDistrict.toLowerCase()
-            );
-
-            if (matchedDistrict) {
-              const dsList = districtDivisionalSecretariats[matchedDistrict] || [];
-              let matchedDS = dsList.find(
-                (ds) => ds.toLowerCase() === detectedDS.toLowerCase()
-              );
-
-              if (!matchedDS && detectedDS) {
-                matchedDS = dsList.find(
-                  (ds) => ds.toLowerCase().includes(detectedDS.toLowerCase()) ||
-                         detectedDS.toLowerCase().includes(ds.toLowerCase())
-                );
-              }
-
-              setSelectedDistrict(matchedDistrict);
-              setSelectedDivisionalSecretariat(matchedDS || "");
-              setIsLocationAutoDetected(true);
-              console.log("Fallback location detected:", { district: matchedDistrict, ds: matchedDS });
-            } else {
-              setLocationError(
-                `Could not determine location automatically. Please select manually.`
-              );
-            }
-          } catch (error) {
-            setLocationError("Failed to detect location. Please select manually.");
-            console.error("Location detection error:", error);
-          }
-        }
-
+        setSelectedDistrict(location.district);
+        setSelectedDivisionalSecretariat(location.divisionalSecretariat);
+        setIsLocationAutoDetected(true);
         setIsLoadingLocation(false);
+         setFormData(prev => ({
+           ...prev,
+             latitude,
+             longitude
+      }));
+
+      setIsLoadingLocation(false);
       },
       (error) => {
         let errorMessage = "Unable to retrieve location";
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "Location access denied by user. Please allow location access and try again.";
+            errorMessage = "Location access denied by user";
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "Location information unavailable. Please check your GPS settings.";
+            errorMessage = "Location information unavailable";
             break;
           case error.TIMEOUT:
-            errorMessage = "Location request is taking longer than expected. Please try again or select manually.";
+            errorMessage = "Location request timed out";
             break;
         }
         setLocationError(errorMessage);
         setIsLoadingLocation(false);
       },
       {
-        enableHighAccuracy: false, // Changed to false for faster response
-        timeout: 30000, // Increased to 30 seconds
-        maximumAge: 300000 // 5 minutes cache
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 600000 // 10 minutes
       }
     );
   };
@@ -234,6 +166,7 @@ export default function RequestAid() {
     setFormData({
       full_name: "",
       contact_no: "",
+      nic_number: "",
       family_size: 1,
       date_time: "",
       description: "",
@@ -288,7 +221,7 @@ export default function RequestAid() {
       }
 
       setShowSuccess(true);
-      setFormData({ full_name: "", contact_no: "", family_size: 1, date_time: "", description: "",district: "",divisional_secretariat: "",
+      setFormData({ full_name: "", nic_number:"" ,contact_no: "", family_size: 1, date_time: "", description: "",district: "",divisional_secretariat: "",
         type_support: "",latitude: null, longitude: null });
       setSelectedDistrict("");
       setSelectedDivisionalSecretariat("");
@@ -369,7 +302,7 @@ export default function RequestAid() {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-red-700 mb-2">Emergency Aid Request</h3>
+                      <h3 className="text-xl font-bold text-red-700 mb-2">Emergency Support Request</h3>
                       <p className="text-gray-600">Quick emergency aid request with GPS location detection and contact information only</p>
                       <div className="mt-2 flex items-center space-x-4 text-sm text-red-600">
                         <span className="flex items-center">
@@ -401,7 +334,7 @@ export default function RequestAid() {
                       </svg>
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-blue-700 mb-2">Regular Aid Request</h3>
+                      <h3 className="text-xl font-bold text-blue-700 mb-2">Post Emergency Period Aids</h3>
                       <p className="text-gray-600">Complete aid request form with detailed information about your needs and situation</p>
                       <div className="mt-2 flex items-center space-x-4 text-sm text-blue-600">
                         <span className="flex items-center">
@@ -438,6 +371,17 @@ export default function RequestAid() {
                 </button>
                 <h1 className="text-3xl md:text-4xl font-bold text-red-700">Emergency Aid Request</h1>
               </div>
+              
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-8 rounded-r-lg">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-red-700 text-sm md:text-base">
+                    <strong>Emergency Request:</strong> Your GPS location is being automatically detected. You can manually select your district and divisional secretariat if the auto-detected location is incorrect.
+                  </p>
+                </div>
+              </div>
 
               {/* Auto GPS Detection Status */}
               {isLoadingLocation && (
@@ -446,6 +390,19 @@ export default function RequestAid() {
                     <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mr-2"></div>
                     <p className="text-blue-700 text-sm md:text-base">
                       <strong>Auto-detecting your location...</strong> Please allow location access when prompted.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {selectedDistrict && selectedDivisionalSecretariat && (
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded-r-lg">
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p className="text-green-700 text-sm md:text-base">
+                      <strong>Location detected:</strong> {selectedDistrict}, {selectedDivisionalSecretariat}
                     </p>
                   </div>
                 </div>
@@ -470,7 +427,7 @@ export default function RequestAid() {
                   <label className="block font-semibold text-base md:text-lg mb-1 md:w-44">Full Name</label>
                   <input
                     type="text"
-                    required
+                    
                     placeholder="Enter your full name"
                     value={formData.full_name}
                     onChange={e => setFormData({ ...formData, full_name: e.target.value })}
@@ -644,6 +601,16 @@ export default function RequestAid() {
                 </button>
                 <h1 className="text-3xl md:text-4xl font-bold">Post Disaster Aid Request</h1>
               </div>
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 rounded-r-lg">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-blue-700 text-sm md:text-base">
+                <strong>Location Detection:</strong> Use "Use GPS" to auto-detect your location, or manually select your district and divisional secretariat. You can change auto-detected locations if they're incorrect.
+              </p>
+            </div>
+          </div>
           <form ref={formRef} className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
             {/* Full Name */}
             <div className="flex flex-col gap-1 md:flex-row md:items-center">
@@ -657,6 +624,20 @@ export default function RequestAid() {
                 className="w-full bg-gray-100 rounded-lg h-10 px-4 text-base md:text-lg focus:outline-none md:ml-2 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
               />
             </div>
+
+            {/* ✅ New NIC Number */}
+             <div className="border-t border-gray-200" />
+            <div className="flex flex-col gap-1 md:flex-row md:items-center">
+           <label className="block font-semibold text-base md:text-lg mb-1 md:w-44">NIC Number</label>
+            <input
+            type="text"
+            required
+            placeholder="Enter your NIC number"
+            value={formData.nic_number}
+            onChange={e => setFormData({ ...formData, nic_number: e.target.value })}
+            className="w-full bg-gray-100 rounded-lg h-10 px-4 text-base md:text-lg focus:outline-none md:ml-2 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+    />
+  </div>
 
             {/* Contact No with Validation */}
             <div className="border-t border-gray-200" />

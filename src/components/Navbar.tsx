@@ -23,9 +23,9 @@ const Navbar = () => {
 
   const navLinks = [
     { path: "/", label: "Home" },
-    { path: "/alerts", label: "Alerts" },
-    { path: "/submit-symptoms", label: "Submit Alert" },
-    { path: "/request-aid", label: "Request Aid" },
+    { path: "/alerts", label: "View Disasters" },
+    { path: "/submit-symptoms", label: "Report Disasters" },
+    { path: "/request-aid", label: "Request Support" },
   ];
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
@@ -85,13 +85,12 @@ const Navbar = () => {
 
       {/* Mobile menu sliding panel */}
       <div 
-        className={`fixed top-0 right-0 h-screen w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 sm:hidden ${
+        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out z-50 sm:hidden ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        style={{ backgroundColor: 'white' }}
       >
-        <div className="flex flex-col h-screen bg-white">
-          <div className="flex justify-end p-4 bg-white">
+        <div className="flex flex-col h-full">
+          <div className="flex justify-end p-4">
             <button
               onClick={() => setIsOpen(false)}
               className="p-2 rounded-md text-gray-600 hover:text-blue-600 focus:outline-none"
@@ -100,7 +99,7 @@ const Navbar = () => {
             </button>
           </div>
           
-          <div className="flex flex-col px-4 space-y-4 bg-white">
+          <div className="flex flex-col px-4 space-y-4">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
