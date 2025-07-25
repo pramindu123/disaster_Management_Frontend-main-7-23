@@ -121,6 +121,16 @@ export default function DisasterMap({
   // Small jitter (~100m) to slightly shift overlapping markers
   const jitter = () => (Math.random() - 0.5) * 0.001;
 
+  // Debug logging to see what data we're receiving
+  console.log("DisasterMap data:", {
+    approvedAidRequests: approvedAidRequests.length,
+    deliveredAidRequests: deliveredAidRequests.length,
+    approvedAlerts: approvedAlerts.length,
+    sampleAidRequest: approvedAidRequests[0],
+    sampleDeliveredAid: deliveredAidRequests[0],
+    sampleAlert: approvedAlerts[0]
+  });
+
   return (
     <MapContainer
       center={[7.8731, 80.7718]}
@@ -133,7 +143,10 @@ export default function DisasterMap({
       />
 
       {/* Alerts in red */}
-      {approvedAlerts.map((alert) => (
+      {approvedAlerts.filter(alert => 
+        alert.latitude && alert.longitude && 
+        !isNaN(alert.latitude) && !isNaN(alert.longitude)
+      ).map((alert) => (
         <CircleMarker
           key={`alert-${alert.id}`}
           center={[alert.latitude + jitter(), alert.longitude + jitter()]}
@@ -151,7 +164,10 @@ export default function DisasterMap({
       ))}
 
       {/* Requested (ongoing) aids in orange ✅ */}
-      {approvedAidRequests.map((aid) => (
+      {approvedAidRequests.filter(aid => 
+        aid.latitude && aid.longitude && 
+        !isNaN(aid.latitude) && !isNaN(aid.longitude)
+      ).map((aid) => (
         <CircleMarker
           key={`aid-requested-${aid.aid_id}`}
           center={[aid.latitude + jitter(), aid.longitude + jitter()]}
@@ -173,7 +189,10 @@ export default function DisasterMap({
       ))}
 
       {/* Delivered aids in green ✅ */}
-      {deliveredAidRequests.map((aid) => (
+      {deliveredAidRequests.filter(aid => 
+        aid.latitude && aid.longitude && 
+        !isNaN(aid.latitude) && !isNaN(aid.longitude)
+      ).map((aid) => (
         <CircleMarker
           key={`aid-delivered-${aid.aid_id}`}
           center={[aid.latitude + jitter(), aid.longitude + jitter()]}
@@ -189,7 +208,7 @@ export default function DisasterMap({
             <br />
             Contact: {aid.contact_no || "N/A"}
             <br />
-            
+            Division: {aid.divisional_secretariat}
           </Popup>
         </CircleMarker>
       ))}

@@ -130,6 +130,19 @@ export default function PostDisasterAidRequest() {
       return;
     }
 
+    // Validate coordinates
+    if (!location.latitude || !location.longitude) {
+      alert("Please select a location or use GPS to get your current location.");
+      return;
+    }
+
+    console.log("Submitting with coordinates:", {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      district: formData.district,
+      ds_division: formData.ds_division
+    });
+
     try {
       const payload = {
         ...formData,
@@ -138,6 +151,8 @@ export default function PostDisasterAidRequest() {
         longitude: location.longitude,
         request_type: "postDisaster"
       };
+
+      console.log("Payload being sent:", payload);
 
       const res = await fetch(`${API_BASE_URL}/AidRequest/create`, {
         method: "POST",
