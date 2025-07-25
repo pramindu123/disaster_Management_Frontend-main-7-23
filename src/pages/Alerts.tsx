@@ -61,12 +61,19 @@ export default function Alerts() {
     }
   };
 
-  const filteredDisasters = disasters.filter(d =>
-    (!selectedType || d.type === selectedType) &&
-    (!selectedDistrict || d.district === selectedDistrict) &&
-    (!selecteddivisional_secretariat || d.divisionalSecretariat === selecteddivisional_secretariat) &&
-    (!selectedSeverity || d.severity === selectedSeverity)
-  );
+  const filteredDisasters = disasters
+    .filter(d =>
+      (!selectedType || d.type === selectedType) &&
+      (!selectedDistrict || d.district === selectedDistrict) &&
+      (!selecteddivisional_secretariat || d.divisionalSecretariat === selecteddivisional_secretariat) &&
+      (!selectedSeverity || d.severity === selectedSeverity)
+    )
+    .sort((a, b) => {
+      // Sort by date in descending order (latest first)
+      const dateA = new Date(a.date + ' ' + a.time);
+      const dateB = new Date(b.date + ' ' + b.time);
+      return dateB.getTime() - dateA.getTime();
+    });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20 px-4 md:px-12 font-sans">
