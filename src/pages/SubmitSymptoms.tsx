@@ -330,9 +330,17 @@ export default function SubmitSymptoms() {
                     required
                     value={district}
                     onChange={e => {
-                      setSelectedDistrict(e.target.value);
+                      const selectedDistrict = e.target.value;
+                      setSelectedDistrict(selectedDistrict);
                       setSelectedDivisionalSecretariat("");
                       setIsLocationAutoDetected(false); // Reset auto-detected flag when manually changed
+                      
+                      // Get coordinates for manually selected district
+                      if (selectedDistrict && districtCoordinates[selectedDistrict]) {
+                        const coords = districtCoordinates[selectedDistrict];
+                        setLatitude(coords.lat);
+                        setLongitude(coords.lng);
+                      }
                     }}
                     className="flex-1 bg-gray-100 rounded-lg h-10 px-4 text-base md:text-lg focus:outline-none border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                   >
@@ -383,8 +391,16 @@ export default function SubmitSymptoms() {
                   required
                   value={divisional_secretariat}
                   onChange={e => {
-                    setSelectedDivisionalSecretariat(e.target.value);
+                    const selectedDS = e.target.value;
+                    setSelectedDivisionalSecretariat(selectedDS);
                     setIsLocationAutoDetected(false); // Reset auto-detected flag when manually changed
+                    
+                    // Get coordinates for manually selected divisional secretariat
+                    if (selectedDS && divisionalSecretariatCoordinates[selectedDS]) {
+                      const coords = divisionalSecretariatCoordinates[selectedDS];
+                      setLatitude(coords.lat);
+                      setLongitude(coords.lng);
+                    }
                   }}
                   className="w-full bg-gray-100 rounded-lg h-10 px-4 text-base md:text-lg focus:outline-none border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                   disabled={!district}
