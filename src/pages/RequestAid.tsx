@@ -371,17 +371,6 @@ export default function RequestAid() {
                 </button>
                 <h1 className="text-3xl md:text-4xl font-bold text-red-700">Emergency Aid Request</h1>
               </div>
-              
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-8 rounded-r-lg">
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <p className="text-red-700 text-sm md:text-base">
-                    <strong>Emergency Request:</strong> Your GPS location is being automatically detected. You can manually select your district and divisional secretariat if the auto-detected location is incorrect.
-                  </p>
-                </div>
-              </div>
 
               {/* Auto GPS Detection Status */}
               {isLoadingLocation && (
@@ -390,19 +379,6 @@ export default function RequestAid() {
                     <div className="w-5 h-5 border-2 border-blue-400 border-t-transparent rounded-full animate-spin mr-2"></div>
                     <p className="text-blue-700 text-sm md:text-base">
                       <strong>Auto-detecting your location...</strong> Please allow location access when prompted.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {selectedDistrict && selectedDivisionalSecretariat && (
-                <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded-r-lg">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <p className="text-green-700 text-sm md:text-base">
-                      <strong>Location detected:</strong> {selectedDistrict}, {selectedDivisionalSecretariat}
                     </p>
                   </div>
                 </div>
