@@ -80,7 +80,7 @@ export default function Alerts() {
             value={selectedType || ""}
             onChange={e => setSelectedType(e.target.value || null)}
           >
-            <option value="">Disaster Type</option>
+            <option value="">All Disaster Types</option>
             {disasterTypes.map(type => (
               <option key={type} value={type}>{type}</option>
             ))}
@@ -91,7 +91,7 @@ export default function Alerts() {
             value={selectedDistrict || ""}
             onChange={handleDistrictChange}
           >
-            <option value="">District</option>
+            <option value="">All Districts</option>
             {districts.map(d => (
               <option key={d} value={d}>{d}</option>
             ))}
@@ -103,7 +103,7 @@ export default function Alerts() {
             onChange={e => setSelectedDivisionalSecretariat(e.target.value || null)}
             disabled={!selectedDistrict}
           >
-            <option value="">Divisional Secretariat</option>
+            <option value="">All Divisional Secretariats</option>
             {dsOptions.map(ds => (
               <option key={ds} value={ds}>{ds}</option>
             ))}
@@ -114,7 +114,7 @@ export default function Alerts() {
             value={selectedSeverity || ""}
             onChange={e => setSelectedSeverity(e.target.value || null)}
           >
-            <option value="">Severity</option>
+            <option value="">All Severity Levels</option>
             {severityTypes.map(sev => (
               <option key={sev} value={sev}>{sev}</option>
             ))}
