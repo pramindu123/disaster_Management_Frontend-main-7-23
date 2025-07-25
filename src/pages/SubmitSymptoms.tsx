@@ -1,6 +1,5 @@
 import React, { useRef, useState } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
-import { districtCoordinates, divisionalSecretariatCoordinates } from "../data/coordinates";
 import { API_BASE_URL } from "../api";
 
 export default function SubmitSymptoms() {
@@ -36,69 +35,49 @@ export default function SubmitSymptoms() {
     return !regex.test(phone) ? "Phone number must be exactly 10 digits" : "";
   };
 
-  // Haversine formula to calculate distance between two coordinates
-  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
-    const toRad = (value: number) => (value * Math.PI) / 180;
-    const R = 6371; // Earth's radius in kilometers
-    
-    const dLat = toRad(lat2 - lat1);
-    const dLng = toRad(lng2 - lng1);
-    
-    const a = 
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
+  const getLocationFromCoordinates = async (latitude: number, longitude: number) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+      );
+      const data = await response.json();
+      console.log("Reverse geocode data:", data);
 
-  const getLocationFromCoordinates = (latitude: number, longitude: number) => {
-    let closestDistrict = "Colombo";
-    let closestDS = "Colombo";
-    let minDistanceToDistrict = Infinity;
-    let minDistanceToDS = Infinity;
+      let detectedDistrict =
+        data.address.county || data.address.state_district || data.address.district || "";
 
-    // Find closest district
-    Object.entries(districtCoordinates).forEach(([district, coords]) => {
-      const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
-      if (distance < minDistanceToDistrict) {
-        minDistanceToDistrict = distance;
-        closestDistrict = district;
+      if (detectedDistrict.toLowerCase().endsWith(" district")) {
+        detectedDistrict = detectedDistrict.slice(0, -9).trim();
       }
-    });
 
-    // Find closest divisional secretariat
-    Object.entries(divisionalSecretariatCoordinates).forEach(([ds, coords]) => {
-      const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
-      if (distance < minDistanceToDS) {
-        minDistanceToDS = distance;
-        closestDS = ds;
-      }
-    });
+      const detectedDS =
+        data.address.suburb || data.address.village || data.address.town || data.address.hamlet || "";
 
-    // Validate that the closest DS belongs to the closest district
-    const districtsDS = districtDivisionalSecretariats[closestDistrict] || [];
-    if (!districtsDS.includes(closestDS)) {
-      // If closest DS doesn't belong to closest district, find closest DS within the district
-      let minDistanceWithinDistrict = Infinity;
-      let closestDSInDistrict = districtsDS[0] || "Colombo";
-      
-      districtsDS.forEach(ds => {
-        const coords = divisionalSecretariatCoordinates[ds];
-        if (coords) {
-          const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
-          if (distance < minDistanceWithinDistrict) {
-            minDistanceWithinDistrict = distance;
-            closestDSInDistrict = ds;
-          }
+      const districts = Object.keys(districtDivisionalSecretariats);
+      const matchedDistrict = districts.find(
+        (d) => d.toLowerCase() === detectedDistrict.toLowerCase()
+      );
+
+      if (matchedDistrict) {
+        const dsList = districtDivisionalSecretariats[matchedDistrict] || [];
+        const matchedDS = dsList.find(
+          (ds) => ds.toLowerCase() === detectedDS.toLowerCase()
+        );
+
+        if (matchedDS) {
+          return { district: matchedDistrict, divisionalSecretariat: matchedDS };
+        } else {
+          return { district: matchedDistrict, divisionalSecretariat: "" };
         }
-      });
-      
-      closestDS = closestDSInDistrict;
+      } else {
+        // Fallback to Colombo if no match found
+        return { district: "Colombo", divisionalSecretariat: "Colombo" };
+      }
+    } catch (error) {
+      console.error("Failed to detect location:", error);
+      // Fallback to Colombo on error
+      return { district: "Colombo", divisionalSecretariat: "Colombo" };
     }
-
-    return { district: closestDistrict, divisionalSecretariat: closestDS };
   };
 
   const getCurrentLocation = () => {
@@ -112,15 +91,22 @@ export default function SubmitSymptoms() {
     }
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
         const { latitude, longitude } = position.coords;
-        const loc = getLocationFromCoordinates(latitude, longitude);
-        setSelectedDistrict(loc.district);
-        setSelectedDivisionalSecretariat(loc.divisionalSecretariat);
-        setIsLocationAutoDetected(true);
         setLatitude(latitude);
         setLongitude(longitude);
-        setIsLoadingLocation(false);
+        
+        try {
+          const loc = await getLocationFromCoordinates(latitude, longitude);
+          setSelectedDistrict(loc.district);
+          setSelectedDivisionalSecretariat(loc.divisionalSecretariat);
+          setIsLocationAutoDetected(true);
+          setIsLoadingLocation(false);
+        } catch (error) {
+          console.error("Error getting location:", error);
+          setLocationError("Failed to detect location from coordinates");
+          setIsLoadingLocation(false);
+        }
       },
       () => {
         setLocationError("Unable to retrieve location");
