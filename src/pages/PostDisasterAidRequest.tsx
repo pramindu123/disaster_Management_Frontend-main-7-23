@@ -232,7 +232,7 @@ export default function PostDisasterAidRequest() {
                     const selectedDistrict = e.target.value;
                     setFormData({ ...formData, district: selectedDistrict, ds_division: "" });
                     
-                    // Get coordinates for manually selected district
+                    // Get coordinates for manually selected district (only if no DS is selected)
                     if (selectedDistrict && districtCoordinates[selectedDistrict]) {
                       const coords = districtCoordinates[selectedDistrict];
                       setLocation((prev) => ({
@@ -241,6 +241,14 @@ export default function PostDisasterAidRequest() {
                         ds: "",
                         latitude: coords.lat,
                         longitude: coords.lng,
+                      }));
+                    } else {
+                      setLocation((prev) => ({
+                        ...prev,
+                        district: selectedDistrict,
+                        ds: "",
+                        latitude: null,
+                        longitude: null,
                       }));
                     }
                   }}
@@ -273,9 +281,18 @@ export default function PostDisasterAidRequest() {
                   const selectedDS = e.target.value;
                   setFormData({ ...formData, ds_division: selectedDS });
                   
-                  // Get coordinates for manually selected divisional secretariat
+                  // Get coordinates for manually selected divisional secretariat (highest priority)
                   if (selectedDS && divisionalSecretariatCoordinates[selectedDS]) {
                     const coords = divisionalSecretariatCoordinates[selectedDS];
+                    setLocation((prev) => ({
+                      ...prev,
+                      ds: selectedDS,
+                      latitude: coords.lat,
+                      longitude: coords.lng,
+                    }));
+                  } else if (formData.district && districtCoordinates[formData.district]) {
+                    // Fall back to district coordinates if DS is cleared
+                    const coords = districtCoordinates[formData.district];
                     setLocation((prev) => ({
                       ...prev,
                       ds: selectedDS,
