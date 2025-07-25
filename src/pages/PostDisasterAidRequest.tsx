@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
+import { districtCoordinates, divisionalSecretariatCoordinates } from "../data/coordinates";
 import { CheckCircle, MapPin } from "lucide-react";
 import { API_BASE_URL } from "../api";
 
@@ -227,9 +228,22 @@ export default function PostDisasterAidRequest() {
                 <select
                   required
                   value={formData.district}
-                  onChange={(e) =>
-                    setFormData({ ...formData, district: e.target.value, ds_division: "" })
-                  }
+                  onChange={(e) => {
+                    const selectedDistrict = e.target.value;
+                    setFormData({ ...formData, district: selectedDistrict, ds_division: "" });
+                    
+                    // Get coordinates for manually selected district
+                    if (selectedDistrict && districtCoordinates[selectedDistrict]) {
+                      const coords = districtCoordinates[selectedDistrict];
+                      setLocation((prev) => ({
+                        ...prev,
+                        district: selectedDistrict,
+                        ds: "",
+                        latitude: coords.lat,
+                        longitude: coords.lng,
+                      }));
+                    }
+                  }}
                   className="w-full bg-gray-100 rounded-lg h-10 px-4 border border-gray-300"
                 >
                   <option value="">Select District</option>
@@ -255,7 +269,21 @@ export default function PostDisasterAidRequest() {
               <select
                 required
                 value={formData.ds_division}
-                onChange={(e) => setFormData({ ...formData, ds_division: e.target.value })}
+                onChange={(e) => {
+                  const selectedDS = e.target.value;
+                  setFormData({ ...formData, ds_division: selectedDS });
+                  
+                  // Get coordinates for manually selected divisional secretariat
+                  if (selectedDS && divisionalSecretariatCoordinates[selectedDS]) {
+                    const coords = divisionalSecretariatCoordinates[selectedDS];
+                    setLocation((prev) => ({
+                      ...prev,
+                      ds: selectedDS,
+                      latitude: coords.lat,
+                      longitude: coords.lng,
+                    }));
+                  }
+                }}
                 disabled={!formData.district}
                 className="w-full bg-gray-100 rounded-lg h-10 px-4 border border-gray-300"
               >
