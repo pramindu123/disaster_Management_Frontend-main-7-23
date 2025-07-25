@@ -445,10 +445,10 @@ export default function DMCReports() {
               <label className="block font-semibold mb-1">Alert Type</label>
               <select
                 name="alertType"
-                value={["Flood", "Landslide", "Fire"].includes(alertForm.alertType) ? alertForm.alertType : "Other"}
+                value={["Flood", "Landslide", "Fire"].includes(alertForm.alertType) ? alertForm.alertType : (alertForm.alertType === "" ? "" : "Other")}
                 onChange={(e) => {
                   if (e.target.value === "Other") {
-                    setAlertForm(prev => ({ ...prev, alertType: "" }));
+                    setAlertForm(prev => ({ ...prev, alertType: "Other" }));
                   } else {
                     setAlertForm(prev => ({ ...prev, alertType: e.target.value }));
                   }
@@ -462,12 +462,12 @@ export default function DMCReports() {
                 <option value="Fire">Fire</option>
                 <option value="Other">Other</option>
               </select>
-              {!["", "Flood", "Landslide", "Fire"].includes(alertForm.alertType) && (
+              {alertForm.alertType === "Other" && (
                 <input
                   type="text"
                   name="customAlertType"
                   placeholder="Please specify the alert type..."
-                  value={alertForm.alertType}
+                  value=""
                   onChange={(e) => setAlertForm(prev => ({ ...prev, alertType: e.target.value }))}
                   className="w-full rounded px-3 py-2 border border-gray-300 mt-2"
                   required
