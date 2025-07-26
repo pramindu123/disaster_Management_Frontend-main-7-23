@@ -440,7 +440,7 @@ export default function RequestAid() {
                 </div>
               )}
 
-              // ...removed location detected message...
+            
 
               {locationError && (
                 <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-r-lg">
