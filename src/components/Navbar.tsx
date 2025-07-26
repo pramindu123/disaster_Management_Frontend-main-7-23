@@ -85,11 +85,11 @@ const Navbar = () => {
 
       {/* Mobile menu sliding panel */}
       <div 
-        className={`fixed top-0 right-0 h-full w-72 z-50 sm:hidden transition-transform duration-300 ease-in-out
+        className={`fixed top-0 right-0 h-screen w-72 z-50 sm:hidden transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
-        style={{ background: "#fff" }} // Ensures solid white background
+        style={{ background: "#fff" }}
       >
-        <div className="flex flex-col h-full bg-white">
+        <div className="flex flex-col h-screen bg-white">
           <div className="flex justify-end p-4">
             <button
               onClick={() => setIsOpen(false)}
