@@ -568,9 +568,8 @@ useEffect(() => {
 
 
       {/* Enhanced Footer */}
-      <footer className="bg-gray-900 mt-8">
+      <footer className="bg-blue-900 mt-8">
         <div className="max-w-7xl mx-auto py-10 px-4 flex flex-col items-center">
-          {/* <img src="hazardx-logo.png" alt="HazardX Logo" className="h-12 w-auto mb-4" /> */}
           <h2 className="text-2xl font-bold text-white mb-2">HazardX Disaster Management</h2>
           <p className="text-gray-300 text-center max-w-2xl mb-6">
             HazardX is a comprehensive disaster management platform that empowers communities with real-time alerts, rapid response coordination, and transparent aid distribution. Our mission is to help you prepare for, respond to, and recover from disasters efficiently and collaboratively.
@@ -589,7 +588,7 @@ useEffect(() => {
               <i className="fas fa-envelope"></i>
             </a>
           </div>
-          <p className="text-gray-500 mt-4 text-sm">© 2025 HazardX Team. Empowering Disaster Management.</p>
+          <p className="text-gray-400 mt-4 text-sm">© 2025 HazardX Team. Empowering Disaster Management.</p>
         </div>
       </footer>
     </div>
