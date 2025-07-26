@@ -85,12 +85,11 @@ const Navbar = () => {
 
       {/* Mobile menu sliding panel */}
       <div 
-        className={`fixed top-0 right-0 h-full w-64 bg-white shadow-lg transition-transform duration-300 ease-in-out z-50 sm:hidden ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-        style={{ backgroundColor: "#fff" }} // Ensures solid white background
+        className={`fixed top-0 right-0 h-full w-64 z-50 sm:hidden transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ background: "#fff" }} // Ensures solid white background
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full bg-white"> {/* Add bg-white here for extra safety */}
           <div className="flex justify-end p-4">
             <button
               onClick={() => setIsOpen(false)}
@@ -100,7 +99,7 @@ const Navbar = () => {
             </button>
           </div>
           
-          <div className="flex flex-col px-4 space-y-4">
+          <div className="flex flex-col px-4 space-y-4 bg-white"> {/* Add bg-white here */}
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
@@ -119,7 +118,7 @@ const Navbar = () => {
               </NavLink>
             ))}
             <div className="mt-6 space-y-3">
-              <Link to="/login" className="w-full block px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-center">
+              <Link to="/login" className="w-full block px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium text-center bg-white">
                 Log in
               </Link>
               <Link to="/signup" className="w-full block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium shadow-md text-center">
