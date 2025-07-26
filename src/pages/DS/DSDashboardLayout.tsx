@@ -126,7 +126,7 @@ export default function DSDashboardLayout() {
             to="/ds-dashboard/resolved-alerts"
             className="bg-white py-2 px-6 rounded-full text-left w-full hover:bg-blue-100"
           >
-            Resolved Alerts
+            Ongoing Alerts
           </NavLink>
 
           <NavLink
