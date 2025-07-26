@@ -567,58 +567,11 @@ useEffect(() => {
 </section>
 
 
-     {/* Features Section with Modern Cards*/ }
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Key Features</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Comprehensive tools and features to help communities prepare, respond, and recover from disasters
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Real-time Alerts',
-                desc: 'Instant notifications about disasters and emergencies in your area',
-                img: 'realtimealerts.jpg',
-              },
-              {
-                title: 'Aid Coordination',
-                desc: 'Efficient distribution of resources and support to affected areas',
-                img: 'aid.jpg',
-              },
-              {
-                title: 'Community Support',
-                desc: 'Connect with volunteers and resources in your local community',
-                img: 'volunteer.jpg',
-              },
-            ].map((feature, idx) => (
-              <div 
-                key={feature.title}
-                className="group bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-                style={{ animationDelay: `${idx * 100}ms` }}
-              >
-                <img
-                  src={feature.img}
-                  alt={feature.title}
-                  className="w-full h-40 object-cover rounded-xl mb-6 shadow"
-                />
-                <div className="mb-6 transform group-hover:scale-110 transition-transform duration-300">
-                  {/* Optionally keep the icon for extra visual, or remove if not needed */}
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Simple Footer with All Rights Reserved */}
       <footer className="bg-white border-t mt-8">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-gray-500">© 2025 HazardX Team. All rights reserved.</p>
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+          <img src="hazardx-logo.png" alt="HazardX Logo" className="h-10 w-auto mb-2" />
+          <p className="text-center text-gray-500">© 2025 HazardX Team. Empowering Disaster Management.</p>
         </div>
       </footer>
     </div>
