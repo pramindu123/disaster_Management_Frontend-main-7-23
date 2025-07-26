@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
-import { districtCoordinates, divisionalSecretariatCoordinates } from "../data/coordinates";
 import { CheckCircle, MapPin } from "lucide-react";
 import { API_BASE_URL } from "../api";
 
@@ -130,29 +129,6 @@ export default function PostDisasterAidRequest() {
       return;
     }
 
-    // Debug the current location state
-    console.log("Current location state before validation:", location);
-    console.log("FormData state:", formData);
-
-    // Validate coordinates - simplified validation
-    if (!location.latitude || !location.longitude) {
-      alert("Please select a location or use GPS to get your current location.");
-      console.log("Coordinate validation failed - missing coordinates:", {
-        latitude: location.latitude,
-        longitude: location.longitude,
-        hasDistrict: !!formData.district,
-        hasDS: !!formData.ds_division
-      });
-      return;
-    }
-
-    console.log("Submitting with coordinates:", {
-      latitude: location.latitude,
-      longitude: location.longitude,
-      district: formData.district,
-      ds_division: formData.ds_division
-    });
-
     try {
       const payload = {
         ...formData,
@@ -161,8 +137,6 @@ export default function PostDisasterAidRequest() {
         longitude: location.longitude,
         request_type: "postDisaster"
       };
-
-      console.log("Payload being sent:", payload);
 
       const res = await fetch(`${API_BASE_URL}/AidRequest/create`, {
         method: "POST",
@@ -194,9 +168,14 @@ export default function PostDisasterAidRequest() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20 px-4 md:px-12 flex items-center justify-center font-sans">
       <div className="w-full max-w-2xl mx-auto p-0 md:p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 transition-all duration-300">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-6">
             Post Disaster Aid Request
           </h1>
+
+          <div className="bg-blue-50 border border-blue-300 p-4 rounded-lg mb-4 text-blue-800">
+            <strong>Location Detection:</strong> Use <strong>"Use GPS"</strong> to auto-detect your
+            location, or manually select your district and divisional secretariat.
+          </div>
 
           <div className="bg-green-50 border border-green-300 p-4 rounded-lg mb-6 flex items-center gap-2 text-green-700">
             <CheckCircle className="w-5 h-5" />
@@ -253,32 +232,9 @@ export default function PostDisasterAidRequest() {
                 <select
                   required
                   value={formData.district}
-                  onChange={(e) => {
-                    const selectedDistrict = e.target.value;
-                    setFormData({ ...formData, district: selectedDistrict, ds_division: "" });
-                    
-                    // Get coordinates for manually selected district (only if no DS is selected)
-                    if (selectedDistrict && districtCoordinates[selectedDistrict]) {
-                      const coords = districtCoordinates[selectedDistrict];
-                      console.log("Setting district coordinates:", coords);
-                      setLocation((prev) => ({
-                        ...prev,
-                        district: selectedDistrict,
-                        ds: "",
-                        latitude: coords.lat,
-                        longitude: coords.lng,
-                      }));
-                    } else {
-                      console.log("Clearing coordinates for district:", selectedDistrict);
-                      setLocation((prev) => ({
-                        ...prev,
-                        district: selectedDistrict,
-                        ds: "",
-                        latitude: null,
-                        longitude: null,
-                      }));
-                    }
-                  }}
+                  onChange={(e) =>
+                    setFormData({ ...formData, district: e.target.value, ds_division: "" })
+                  }
                   className="w-full bg-gray-100 rounded-lg h-10 px-4 border border-gray-300"
                 >
                   <option value="">Select District</option>
@@ -304,34 +260,7 @@ export default function PostDisasterAidRequest() {
               <select
                 required
                 value={formData.ds_division}
-                onChange={(e) => {
-                  const selectedDS = e.target.value;
-                  setFormData({ ...formData, ds_division: selectedDS });
-                  
-                  // Get coordinates for manually selected divisional secretariat (highest priority)
-                  if (selectedDS && divisionalSecretariatCoordinates[selectedDS]) {
-                    const coords = divisionalSecretariatCoordinates[selectedDS];
-                    console.log("Setting DS coordinates:", coords);
-                    setLocation((prev) => ({
-                      ...prev,
-                      ds: selectedDS,
-                      latitude: coords.lat,
-                      longitude: coords.lng,
-                    }));
-                  } else if (formData.district && districtCoordinates[formData.district]) {
-                    // Fall back to district coordinates if DS is cleared
-                    const coords = districtCoordinates[formData.district];
-                    console.log("Falling back to district coordinates:", coords);
-                    setLocation((prev) => ({
-                      ...prev,
-                      ds: selectedDS,
-                      latitude: coords.lat,
-                      longitude: coords.lng,
-                    }));
-                  } else {
-                    console.log("No coordinates available for DS:", selectedDS);
-                  }
-                }}
+                onChange={(e) => setFormData({ ...formData, ds_division: e.target.value })}
                 disabled={!formData.district}
                 className="w-full bg-gray-100 rounded-lg h-10 px-4 border border-gray-300"
               >
