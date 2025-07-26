@@ -85,11 +85,11 @@ const Navbar = () => {
 
       {/* Mobile menu sliding panel */}
       <div 
-        className={`fixed top-0 right-0 h-full w-64 z-50 sm:hidden transition-transform duration-300 ease-in-out
+        className={`fixed inset-0 z-50 sm:hidden transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ background: "#fff" }} // Ensures solid white background
       >
-        <div className="flex flex-col h-full bg-white"> {/* Add bg-white here for extra safety */}
+        <div className="flex flex-col h-full bg-white">
           <div className="flex justify-end p-4">
             <button
               onClick={() => setIsOpen(false)}
@@ -99,7 +99,7 @@ const Navbar = () => {
             </button>
           </div>
           
-          <div className="flex flex-col px-4 space-y-4 bg-white"> {/* Add bg-white here */}
+          <div className="flex flex-col px-4 space-y-4 bg-white flex-1">
             {navLinks.map((link) => (
               <NavLink
                 key={link.path}
