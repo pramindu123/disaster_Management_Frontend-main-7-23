@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import districtGnDivisions from "../data/districtDivisionalSecretariats";
 import DisasterMap from "../components/DisasterMap";
 import { API_BASE_URL } from "../api";
+import { FaExclamationTriangle, FaMapMarkedAlt, FaHandsHelping, FaDonate, FaUserPlus } from "react-icons/fa";
 
 const rowsPerPage = 6;
 
@@ -287,69 +288,80 @@ useEffect(() => {
         </div>
       </section>
              <section ref={aboutRef} className="max-w-5xl mx-auto mb-16 scroll-mt-28 px-4">
-  <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 mt-4">
-    <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
-      About the HazardX System
-    </h2>
-    <p className="text-lg text-gray-700 mb-8">
-      Our system helps communities prepare for, respond to, and recover from disasters efficiently.
-    </p>
+        <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 mt-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+            About the HazardX System
+          </h2>
+          <p className="text-lg text-gray-700 mb-8">
+            Our system helps communities prepare for, respond to, and recover from disasters efficiently.
+          </p>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {[
-        {
-          title: "Report Disasters",
-          desc: "Easily report disasters for quick response.",
-          path: "/submit-symptoms",
-        },
-        {
-          title: "View Disaster",
-          desc: "Access real-time disaster information with an interactive map.",
-          path: "/alerts",
-        },
-        {
-          title: "Request Support",
-          desc: "Ask for emergency support and post emergency period aids.",
-          path: "/request-aid",
-        },
-      ].map((item) => (
-        <div
-          key={item.title}
-          onClick={() => handleTileClick(item.path)}
-          className="flex flex-col items-center justify-center bg-blue-50 text-center rounded-xl p-6 shadow hover:shadow-md transition transform hover:-translate-y-1 w-full cursor-pointer"
-        >
-          <h3 className="text-lg font-semibold text-blue-800 mb-2">{item.title}</h3>
-          <p className="text-gray-600 text-sm">{item.desc}</p>
-        </div>
-      ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Report Disasters",
+                desc: "Easily report disasters for quick response.",
+                path: "/submit-symptoms",
+                icon: <FaExclamationTriangle className="text-3xl text-blue-600 mb-2" />,
+              },
+              {
+                title: "View Disaster",
+                desc: "Access real-time disaster information with an interactive map.",
+                path: "/alerts",
+                icon: <FaMapMarkedAlt className="text-3xl text-purple-600 mb-2" />,
+              },
+              {
+                title: "Request Support",
+                desc: "Ask for emergency support and post emergency period aids.",
+                path: "/request-aid",
+                icon: <FaHandsHelping className="text-3xl text-green-600 mb-2" />,
+              },
+            ].map((item) => (
+              <button
+                key={item.title}
+                onClick={() => handleTileClick(item.path)}
+                className="flex flex-col items-center justify-center bg-blue-50 text-center rounded-xl p-6 shadow hover:shadow-lg transition transform hover:-translate-y-1 w-full cursor-pointer border-2 border-transparent hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                type="button"
+                tabIndex={0}
+              >
+                {item.icon}
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">{item.title}</h3>
+                <p className="text-gray-600 text-sm">{item.desc}</p>
+              </button>
+            ))}
 
-      {/* Second row: wrap last 2 tiles */}
-      <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 justify-center">
-        {[
-          {
-            title: "Donors Donation",
-            desc: "Donate to support disaster relief efforts.",
-            path: "#aid-table",
-          },
-          {
-            title: "Volunteers",
-            desc: "Join as a volunteer to help affected communities.",
-            path: "/signup",
-          },
-        ].map((item) => (
-          <div
-            key={item.title}
-            onClick={() => handleTileClick(item.path)}
-            className="flex flex-col items-center justify-center bg-blue-50 text-center rounded-xl p-6 shadow hover:shadow-md transition transform hover:-translate-y-1 w-full cursor-pointer"
-          >
-            <h3 className="text-lg font-semibold text-blue-800 mb-2">{item.title}</h3>
-            <p className="text-gray-600 text-sm">{item.desc}</p>
+            {/* Second row: wrap last 2 tiles */}
+            <div className="md:col-span-3 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6 justify-center">
+              {[
+                {
+                  title: "Donors Donation",
+                  desc: "Donate to support disaster relief efforts.",
+                  path: "#aid-table",
+                  icon: <FaDonate className="text-3xl text-yellow-600 mb-2" />,
+                },
+                {
+                  title: "Volunteers",
+                  desc: "Join as a volunteer to help affected communities.",
+                  path: "/signup",
+                  icon: <FaUserPlus className="text-3xl text-pink-600 mb-2" />,
+                },
+              ].map((item) => (
+                <button
+                  key={item.title}
+                  onClick={() => handleTileClick(item.path)}
+                  className="flex flex-col items-center justify-center bg-blue-50 text-center rounded-xl p-6 shadow hover:shadow-lg transition transform hover:-translate-y-1 w-full cursor-pointer border-2 border-transparent hover:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                  type="button"
+                  tabIndex={0}
+                >
+                  {item.icon}
+                  <h3 className="text-lg font-semibold text-blue-800 mb-2">{item.title}</h3>
+                  <p className="text-gray-600 text-sm">{item.desc}</p>
+                </button>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</section>
+        </div>
+      </section>
 
         {/* Map */}
       <section className="w-full mb-16 max-w-7xl mx-auto px-4">
