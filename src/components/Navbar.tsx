@@ -85,7 +85,7 @@ const Navbar = () => {
 
       {/* Mobile menu sliding panel */}
       <div 
-        className={`fixed inset-0 z-50 sm:hidden transition-transform duration-300 ease-in-out
+        className={`fixed top-0 right-0 h-full w-72 z-50 sm:hidden transition-transform duration-300 ease-in-out
           ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
         style={{ background: "#fff" }} // Ensures solid white background
       >
