@@ -567,11 +567,29 @@ useEffect(() => {
 </section>
 
 
-      {/* Simple Footer with All Rights Reserved */}
-      <footer className="bg-white border-t mt-8">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-          <img src="hazardx-logo.png" alt="HazardX Logo" className="h-10 w-auto mb-2" />
-          <p className="text-center text-gray-500">© 2025 HazardX Team. Empowering Disaster Management.</p>
+      {/* Enhanced Footer */}
+      <footer className="bg-gray-900 mt-8">
+        <div className="max-w-7xl mx-auto py-10 px-4 flex flex-col items-center">
+          <img src="hazardx-logo.png" alt="HazardX Logo" className="h-12 w-auto mb-4" />
+          <h2 className="text-2xl font-bold text-white mb-2">HazardX Disaster Management</h2>
+          <p className="text-gray-300 text-center max-w-2xl mb-6">
+            HazardX is a comprehensive disaster management platform that empowers communities with real-time alerts, rapid response coordination, and transparent aid distribution. Our mission is to help you prepare for, respond to, and recover from disasters efficiently and collaboratively.
+          </p>
+          <div className="flex space-x-4 mb-2">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-2xl">
+              <i className="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-2xl">
+              <i className="fab fa-twitter"></i>
+            </a>
+            <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white text-2xl">
+              <i className="fab fa-linkedin-in"></i>
+            </a>
+            <a href="mailto:info@hazardx.com" className="text-gray-300 hover:text-white text-2xl">
+              <i className="fas fa-envelope"></i>
+            </a>
+          </div>
+          <p className="text-gray-500 mt-4 text-sm">© 2025 HazardX Team. Empowering Disaster Management.</p>
         </div>
       </footer>
     </div>
