@@ -38,7 +38,7 @@ export interface GeminiResponse {
 export class ImageVerificationService {
   private static instance: ImageVerificationService;
   private apiKey: string = process.env.REACT_APP_GEMINI_API_KEY || '';
-  private apiEndpoint: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+  private apiEndpoint: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
   static getInstance(): ImageVerificationService {
     if (!ImageVerificationService.instance) {
@@ -155,10 +155,11 @@ export class ImageVerificationService {
     };
 
     try {
-      const response = await fetch(`${this.apiEndpoint}?key=${this.apiKey}`, {
+      const response = await fetch(this.apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'X-goog-api-key': this.apiKey
         },
         body: JSON.stringify(requestBody)
       });
