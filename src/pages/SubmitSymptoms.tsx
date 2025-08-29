@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import districtDivisionalSecretariats from "../data/districtDivisionalSecretariats";
-import { districtCoordinates, divisionalSecretariatCoordinates } from "../data/coordinates";
+import { getDivisionalSecretariatCoordinates, getDistrictCoordinates, districtCoordinates, divisionalSecretariatCoordinates } from "../data/coordinates";
 import { API_BASE_URL } from "../api";
 
 export default function SubmitSymptoms() {
@@ -36,69 +36,55 @@ export default function SubmitSymptoms() {
     return !regex.test(phone) ? "Phone number must be exactly 10 digits" : "";
   };
 
-  // Haversine formula to calculate distance between two coordinates
-  const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
-    const toRad = (value: number) => (value * Math.PI) / 180;
-    const R = 6371; // Earth's radius in kilometers
-    
-    const dLat = toRad(lat2 - lat1);
-    const dLng = toRad(lng2 - lng1);
-    
-    const a = 
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLng / 2) * Math.sin(dLng / 2);
-    
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  };
+  // Find closest district and DS using coordinates.ts data
 
   const getLocationFromCoordinates = (latitude: number, longitude: number) => {
-    let closestDistrict = "Colombo";
-    let closestDS = "Colombo";
-    let minDistanceToDistrict = Infinity;
-    let minDistanceToDS = Infinity;
-
-    // Find closest district
-    Object.entries(districtCoordinates).forEach(([district, coords]) => {
-      const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
-      if (distance < minDistanceToDistrict) {
-        minDistanceToDistrict = distance;
-        closestDistrict = district;
-      }
-    });
-
-    // Find closest divisional secretariat
-    Object.entries(divisionalSecretariatCoordinates).forEach(([ds, coords]) => {
-      const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
-      if (distance < minDistanceToDS) {
-        minDistanceToDS = distance;
-        closestDS = ds;
-      }
-    });
-
-    // Validate that the closest DS belongs to the closest district
-    const districtsDS = districtDivisionalSecretariats[closestDistrict] || [];
-    if (!districtsDS.includes(closestDS)) {
-      // If closest DS doesn't belong to closest district, find closest DS within the district
-      let minDistanceWithinDistrict = Infinity;
-      let closestDSInDistrict = districtsDS[0] || "Colombo";
-      
-      districtsDS.forEach(ds => {
-        const coords = divisionalSecretariatCoordinates[ds];
-        if (coords) {
-          const distance = calculateDistance(latitude, longitude, coords.lat, coords.lng);
-          if (distance < minDistanceWithinDistrict) {
-            minDistanceWithinDistrict = distance;
-            closestDSInDistrict = ds;
-          }
-        }
-      });
-      
-      closestDS = closestDSInDistrict;
+    // Helper to calculate distance between two lat/lng points
+    function getDistance(lat1: number, lng1: number, lat2: number, lng2: number) {
+      return Math.sqrt(Math.pow(lat1 - lat2, 2) + Math.pow(lng1 - lng2, 2));
     }
 
-    return { district: closestDistrict, divisionalSecretariat: closestDS };
+    // Find closest DS
+    let closestDS: string | undefined = undefined;
+    let minDSDist = Infinity;
+    let closestDistrict: string | undefined = undefined;
+    let minDistrictDist = Infinity;
+
+    // Find closest DS
+    for (const [dsName, coords] of Object.entries(divisionalSecretariatCoordinates)) {
+      const dist = getDistance(latitude, longitude, coords.lat, coords.lng);
+      if (dist < minDSDist) {
+        minDSDist = dist;
+        closestDS = dsName;
+      }
+    }
+
+    // Find closest district
+    for (const [districtName, coords] of Object.entries(districtCoordinates)) {
+      const dist = getDistance(latitude, longitude, coords.lat, coords.lng);
+      if (dist < minDistrictDist) {
+        minDistrictDist = dist;
+        closestDistrict = districtName;
+      }
+    }
+
+    // If closest DS is in the closest district, use both
+    // Otherwise, fallback to closest DS and its district if possible
+    // Try to match DS to districtDivisionalSecretariats
+    let finalDistrict = closestDistrict;
+    if (closestDS && closestDistrict && districtDivisionalSecretariats[closestDistrict]?.includes(closestDS)) {
+      finalDistrict = closestDistrict;
+    } else if (closestDS) {
+      // Find which district contains the DS
+      for (const [districtName, dsList] of Object.entries(districtDivisionalSecretariats)) {
+        if (dsList.includes(closestDS)) {
+          finalDistrict = districtName;
+          break;
+        }
+      }
+    }
+
+    return { district: finalDistrict || "Colombo", divisionalSecretariat: closestDS || "Colombo" };
   };
 
   const getCurrentLocation = () => {
@@ -114,20 +100,13 @@ export default function SubmitSymptoms() {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude } = position.coords;
+        const loc = getLocationFromCoordinates(latitude, longitude);
+        setSelectedDistrict(loc.district);
+        setSelectedDivisionalSecretariat(loc.divisionalSecretariat);
+        setIsLocationAutoDetected(true);
         setLatitude(latitude);
         setLongitude(longitude);
-        
-        try {
-          const loc = getLocationFromCoordinates(latitude, longitude);
-          setSelectedDistrict(loc.district);
-          setSelectedDivisionalSecretariat(loc.divisionalSecretariat);
-          setIsLocationAutoDetected(true);
-          setIsLoadingLocation(false);
-        } catch (error) {
-          console.error("Error getting location:", error);
-          setLocationError("Failed to detect location from coordinates");
-          setIsLoadingLocation(false);
-        }
+        setIsLoadingLocation(false);
       },
       () => {
         setLocationError("Unable to retrieve location");
@@ -195,38 +174,60 @@ export default function SubmitSymptoms() {
     setIsLocationAutoDetected(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+ 
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!validateForm()) return;
 
-    const reportData = {
-      reporter_name,
-      nic_number,
-      contact_no,
-      district,
-      divisional_secretariat,
-      date_time: new Date(date_time).toISOString(),
-      description,
-      image, // ✅ base64 image
-      action: "Pending",
-      latitude,
-      longitude
-    };
+  let lat = latitude;
+  let lng = longitude;
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/Symptoms/create`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reportData)
-      });
-      if (!response.ok) throw new Error(await response.text());
-      setShowSuccess(true);
-      handleClear();
-    } catch (error) {
-      console.error(error);
-      alert("Failed to submit. Try again.");
+  // If user did NOT click GPS → fallback to manual coordinates
+  if (!lat || !lng) {
+    const dsCoords = getDivisionalSecretariatCoordinates(divisional_secretariat);
+    const districtCoords = getDistrictCoordinates(district);
+
+    if (dsCoords) {
+      lat = dsCoords.lat;
+      lng = dsCoords.lng;
+    } else if (districtCoords) {
+      lat = districtCoords.lat;
+      lng = districtCoords.lng;
+    } else {
+      alert("Could not find coordinates for the selected district/DS.");
+      return;
     }
+  }
+
+  const reportData = {
+    reporter_name,
+    nic_number,
+    contact_no,
+    district,
+    divisional_secretariat,
+    date_time: date_time,
+    description,
+    image, // ✅ base64 image
+    action: "Pending",
+    latitude: lat,
+    longitude: lng
   };
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/Symptoms/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reportData)
+    });
+    if (!response.ok) throw new Error(await response.text());
+    setShowSuccess(true);
+    handleClear();
+  } catch (error) {
+    console.error(error);
+    alert("Failed to submit. Try again.");
+  }
+};
+
 
   const districts = Object.keys(districtDivisionalSecretariats);
   const divisionalSecretariats = district ? districtDivisionalSecretariats[district] : [];
@@ -235,7 +236,17 @@ export default function SubmitSymptoms() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 pt-20 px-4 md:px-12 font-sans flex items-center justify-center">
       <div className="w-full max-w-2xl mx-auto p-0 md:p-6">
         <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 transition-all duration-300">
-          <h1 className="text-3xl md:text-4xl font-bold text-center mb-8">Report Early Warnings</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-center mb-4">Submit Symptoms</h1>
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 rounded-r-lg">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-blue-700 text-sm md:text-base">
+                <strong>Location Detection:</strong> Use "Current Location" to auto-detect your location, or manually select your district and divisional secretariat. You can change auto-detected locations if they're incorrect.
+              </p>
+            </div>
+          </div>
           <form ref={formRef} className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
             {/* Full Name */}
             <div className="flex flex-col gap-1 md:flex-row md:items-center">
@@ -330,17 +341,9 @@ export default function SubmitSymptoms() {
                     required
                     value={district}
                     onChange={e => {
-                      const selectedDistrict = e.target.value;
-                      setSelectedDistrict(selectedDistrict);
+                      setSelectedDistrict(e.target.value);
                       setSelectedDivisionalSecretariat("");
                       setIsLocationAutoDetected(false); // Reset auto-detected flag when manually changed
-                      
-                      // Get coordinates for manually selected district
-                      if (selectedDistrict && districtCoordinates[selectedDistrict]) {
-                        const coords = districtCoordinates[selectedDistrict];
-                        setLatitude(coords.lat);
-                        setLongitude(coords.lng);
-                      }
                     }}
                     className="flex-1 bg-gray-100 rounded-lg h-10 px-4 text-base md:text-lg focus:outline-none border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                   >
@@ -391,16 +394,8 @@ export default function SubmitSymptoms() {
                   required
                   value={divisional_secretariat}
                   onChange={e => {
-                    const selectedDS = e.target.value;
-                    setSelectedDivisionalSecretariat(selectedDS);
+                    setSelectedDivisionalSecretariat(e.target.value);
                     setIsLocationAutoDetected(false); // Reset auto-detected flag when manually changed
-                    
-                    // Get coordinates for manually selected divisional secretariat
-                    if (selectedDS && divisionalSecretariatCoordinates[selectedDS]) {
-                      const coords = divisionalSecretariatCoordinates[selectedDS];
-                      setLatitude(coords.lat);
-                      setLongitude(coords.lng);
-                    }
                   }}
                   className="w-full bg-gray-100 rounded-lg h-10 px-4 text-base md:text-lg focus:outline-none border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
                   disabled={!district}

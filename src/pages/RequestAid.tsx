@@ -140,17 +140,16 @@ export default function RequestAid() {
   };
 
   // Automatically get GPS location when emergency option is selected
-  useEffect(() => {
-    if (selectedOption === 'emergency') {
-      // Clear any previous location data and errors
-      setSelectedDistrict("");
-      setSelectedDivisionalSecretariat("");
-      setLocationError("");
-      setIsLocationAutoDetected(false);
-      // Automatically trigger GPS location detection
-      getCurrentLocation();
-    }
-  }, [selectedOption]);
+  // Auto-fill current local date/time for emergency requests
+useEffect(() => {
+  if (selectedOption === 'emergency') {
+    const now = new Date();
+    const localISO = now.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:mm"
+    setFormData(prev => ({ ...prev, date_time: localISO }));
+    getCurrentLocation(); // trigger GPS
+  }
+}, [selectedOption]);
+
 
   const handleClear = () => {
     formRef.current?.reset();
@@ -177,24 +176,29 @@ export default function RequestAid() {
     setIsLocationAutoDetected(false);
   };
 
-  // Emergency Aid submission
-  const handleEmergencySubmit = async (e: React.FormEvent) => {
+const handleEmergencySubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
+  // Validate phone number
   const phoneError = validatePhoneNumber(formData.contact_no);
   if (phoneError) {
     setErrors({ ...errors, contact_no: phoneError });
     return;
   }
 
-  // Fallback for coordinates if not auto-detected
+  // Get current local datetime in "YYYY-MM-DDTHH:mm:ss" format
+  const now = new Date();
+  const offset = now.getTimezoneOffset(); // in minutes
+  const localDateTime = new Date(now.getTime() - offset * 60 * 1000)
+    .toISOString()
+    .slice(0, 19); // remove milliseconds and Z
+
+  // Use coordinates from form, or fallback to DS/District coordinates
   let lat = formData.latitude;
   let lng = formData.longitude;
-
   if (!lat || !lng) {
     const dsCoords = getDivisionalSecretariatCoordinates(selectedDivisionalSecretariat);
     const districtCoords = getDistrictCoordinates(selectedDistrict);
-
     if (dsCoords) {
       lat = dsCoords.lat;
       lng = dsCoords.lng;
@@ -207,13 +211,15 @@ export default function RequestAid() {
     }
   }
 
+  // Prepare payload
   const emergencyPayload = {
     full_name: formData.full_name,
+    nic_number: formData.nic_number,
     contact_no: formData.contact_no,
     district: selectedDistrict,
     divisional_secretariat: selectedDivisionalSecretariat,
-    family_size: 1,
-    date_time: new Date().toISOString(),
+    family_size: formData.family_size,
+    date_time: localDateTime,  // <-- now local time
     description: "Emergency aid request - GPS location detected",
     type_support: "Emergency Aid",
     request_type: "Emergency",
@@ -224,9 +230,7 @@ export default function RequestAid() {
   try {
     const res = await fetch(`${API_BASE_URL}/AidRequest/create`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(emergencyPayload)
     });
 
@@ -236,6 +240,7 @@ export default function RequestAid() {
     }
 
     setShowSuccess(true);
+    // Reset form
     setFormData({
       full_name: "",
       nic_number: "",
@@ -259,7 +264,7 @@ export default function RequestAid() {
 };
 
 
- const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   const phoneError = validatePhoneNumber(formData.contact_no);
@@ -268,14 +273,15 @@ export default function RequestAid() {
     return;
   }
 
-  // Get coordinates fallback
+  // Use local datetime exactly as entered
+  const localDateTime = formData.date_time; // e.g. "2025-08-29T12:30"
+
+  // Coordinates fallback
   let lat = formData.latitude;
   let lng = formData.longitude;
-
   if (!lat || !lng) {
     const dsCoords = getDivisionalSecretariatCoordinates(selectedDivisionalSecretariat);
     const districtCoords = getDistrictCoordinates(selectedDistrict);
-
     if (dsCoords) {
       lat = dsCoords.lat;
       lng = dsCoords.lng;
@@ -296,28 +302,19 @@ export default function RequestAid() {
     request_type: "postDisaster",
     latitude: lat,
     longitude: lng,
+    date_time: localDateTime,  // <-- send as-is
   };
 
   try {
     const res = await fetch(`${API_BASE_URL}/AidRequest/create`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestPayload),
     });
 
     if (!res.ok) {
       const errorData = await res.json().catch(() => ({ message: "Unknown server error" }));
       throw new Error(errorData.message || `Server error: ${res.status}`);
-    }
-
-    // Handle response based on content type
-    const contentType = res.headers.get("content-type");
-    if (contentType && contentType.includes("application/json")) {
-      await res.json();
-    } else {
-      await res.text(); // fallback in case response is plain text
     }
 
     setShowSuccess(true);
@@ -422,7 +419,16 @@ export default function RequestAid() {
                 <h1 className="text-3xl md:text-4xl font-bold text-red-700">Emergency Aid Request</h1>
               </div>
               
-              {/* Info box removed as requested */}
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-8 rounded-r-lg">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <p className="text-red-700 text-sm md:text-base">
+                    <strong>Emergency Request:</strong> Your GPS location is being automatically detected. You can manually select your district and divisional secretariat if the auto-detected location is incorrect.
+                  </p>
+                </div>
+              </div>
 
               {/* Auto GPS Detection Status */}
               {isLoadingLocation && (
@@ -436,7 +442,18 @@ export default function RequestAid() {
                 </div>
               )}
 
-              {/* Location detected message removed as requested */}
+              {selectedDistrict && selectedDivisionalSecretariat && (
+                <div className="bg-green-50 border-l-4 border-green-400 p-4 mb-6 rounded-r-lg">
+                  <div className="flex items-center">
+                    <svg className="w-5 h-5 text-green-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <p className="text-green-700 text-sm md:text-base">
+                      <strong>Location detected:</strong> {selectedDistrict}, {selectedDivisionalSecretariat}
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {locationError && (
                 <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6 rounded-r-lg">
@@ -620,7 +637,7 @@ export default function RequestAid() {
           {/* Regular Aid Form (existing comprehensive form) */}
           {selectedOption === 'regular' && (
             <>
-              <div className="flex items-center mb-8">
+              <div className="flex items-center mb-4">
                 <button
                   onClick={() => setSelectedOption(null)}
                   className="mr-4 p-2 rounded-lg hover:bg-gray-100 transition-colors"
@@ -631,7 +648,16 @@ export default function RequestAid() {
                 </button>
                 <h1 className="text-3xl md:text-4xl font-bold">Post Disaster Aid Request</h1>
               </div>
-          {/* Location Detection info box removed as requested */}
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-8 rounded-r-lg">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-blue-700 text-sm md:text-base">
+                <strong>Location Detection:</strong> Use "Use GPS" to auto-detect your location, or manually select your district and divisional secretariat. You can change auto-detected locations if they're incorrect.
+              </p>
+            </div>
+          </div>
           <form ref={formRef} className="space-y-6" onSubmit={handleSubmit} autoComplete="off">
             {/* Full Name */}
             <div className="flex flex-col gap-1 md:flex-row md:items-center">
