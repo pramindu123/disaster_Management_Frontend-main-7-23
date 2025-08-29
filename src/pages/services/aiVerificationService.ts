@@ -247,12 +247,17 @@ Be thorough but concise. Focus on disaster management context.
       
       const { minConfidenceThreshold = 0.7 } = options;
       
+      const confidence = parsedResponse.confidence || 0;
+      const matchScore = parsedResponse.matchScore || 0;
+      const isAuthentic = parsedResponse.isAuthentic &&
+        (confidence >= minConfidenceThreshold * 100) &&
+        (matchScore >= 70); // Require matchScore >= 70 for legitimate
       return {
         isVerifying: false,
-        isAuthentic: parsedResponse.isAuthentic && (parsedResponse.confidence >= minConfidenceThreshold * 100),
-        confidence: parsedResponse.confidence || 0,
+        isAuthentic,
+        confidence,
         analysis: parsedResponse.analysis || 'Analysis completed',
-        matchScore: parsedResponse.matchScore || 0,
+        matchScore,
         flags: parsedResponse.flags || []
       };
 
