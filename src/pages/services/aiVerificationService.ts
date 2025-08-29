@@ -37,7 +37,7 @@ export interface GeminiResponse {
 // Real AI Service using Google Gemini Flash API
 export class ImageVerificationService {
   private static instance: ImageVerificationService;
-  private apiKey: string = 'AIzaSyCWr6cnOcZaaU-eTqw_nGz4G0wbHYGygig';
+  private apiKey: string = process.env.REACT_APP_GEMINI_API_KEY || '';
   private apiEndpoint: string = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
   static getInstance(): ImageVerificationService {
@@ -64,13 +64,13 @@ export class ImageVerificationService {
       detectDeepfakes = true
     } = options;
 
-    // Try main AI API, fallback to mock analysis if it fails
+    // Use Gemini API, fallback to mock analysis only if Gemini fails
     try {
       const imageBase64 = await this.convertImageToBase64(imageUrl);
       const geminiAnalysis = await this.analyzeWithGemini(imageBase64, description, options);
       return geminiAnalysis;
     } catch (error) {
-      console.error('AI Verification failed, using fallback:', error);
+      console.error('Gemini AI Verification failed, using fallback:', error);
       return this.fallbackMockAnalysis(imageUrl, description, options);
     }
   }
