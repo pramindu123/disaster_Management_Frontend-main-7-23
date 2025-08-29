@@ -64,21 +64,16 @@ export class ImageVerificationService {
       detectDeepfakes = true
     } = options;
 
+    // Only use Gemini API, do not fallback to mock analysis
+    // Convert image to base64 for Gemini API
     try {
-      // Convert image to base64 for Gemini API
       const imageBase64 = await this.convertImageToBase64(imageUrl);
-      
       // Call Gemini Flash API for comprehensive analysis
       const geminiAnalysis = await this.analyzeWithGemini(imageBase64, description, options);
-      
       return geminiAnalysis;
-
     } catch (error) {
       console.error('Gemini AI Verification failed:', error);
-      
-      // Fallback to mock analysis if API fails
-      console.log('Falling back to mock analysis...');
-      return this.fallbackMockAnalysis(imageUrl, description, options);
+      throw error;
     }
   }
 
