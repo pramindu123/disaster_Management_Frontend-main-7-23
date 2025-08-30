@@ -425,8 +425,33 @@ export default function SubmitSymptoms() {
               <input
                 type="datetime-local"
                 required
-                value={date_time}
-                onChange={(e) => setDateTime(e.target.value)}
+                value={(() => {
+                  if (!date_time) return "";
+                  // Convert stored ISO string to local datetime-local value in Asia/Colombo
+                  const dt = new Date(date_time);
+                  const offset = dt.getTimezoneOffset();
+                  const local = new Date(dt.getTime() - (offset * 60000));
+                  return local.toISOString().slice(0,16);
+                })()}
+                onChange={e => {
+                  // Convert input (local) to Asia/Colombo ISO string
+                  const localValue = e.target.value;
+                  if (!localValue) return setDateTime("");
+                  // localValue is 'YYYY-MM-DDTHH:mm', treat as Asia/Colombo
+                  const [date, time] = localValue.split('T');
+                  const [year, month, day] = date.split('-');
+                  const [hour, minute] = time.split(':');
+                  // Create a Date object in Asia/Colombo
+                  const colomboDate = new Date(Date.UTC(
+                    Number(year),
+                    Number(month) - 1,
+                    Number(day),
+                    Number(hour) - 5,
+                    Number(minute) - 30
+                  ));
+                  // Store as ISO string in Asia/Colombo
+                  setDateTime(colomboDate.toISOString().slice(0,19).replace('T', ' '));
+                }}
                 className="w-full bg-gray-100 rounded-lg h-10 px-4 text-base md:text-lg focus:outline-none md:ml-2 border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
               />
             </div>
