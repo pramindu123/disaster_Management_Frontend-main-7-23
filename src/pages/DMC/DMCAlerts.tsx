@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../api";
 
+
 export default function DMCAlerts() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [typeFilter, setTypeFilter] = useState('');
+  const [dsFilter, setDSFilter] = useState('');
+  const [severityFilter, setSeverityFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
     const dmcData = JSON.parse(localStorage.getItem("dmcOfficerData") || "{}");
@@ -37,6 +42,36 @@ export default function DMCAlerts() {
         </button>
       </div>
 
+      {/* Filter Controls */}
+      {!loading && alerts.length > 0 && (
+        <div className="flex flex-wrap gap-4 mb-4">
+          <select className="px-3 py-2 rounded border" value={typeFilter} onChange={e => setTypeFilter(e.target.value)}>
+            <option value="">All Types</option>
+            {Array.from(new Set(alerts.map(a => a.alert_type))).map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+          <select className="px-3 py-2 rounded border" value={dsFilter} onChange={e => setDSFilter(e.target.value)}>
+            <option value="">All Divisional Secretariats</option>
+            {Array.from(new Set(alerts.map(a => a.divisional_secretariat))).map(ds => (
+              <option key={ds} value={ds}>{ds}</option>
+            ))}
+          </select>
+          <select className="px-3 py-2 rounded border" value={severityFilter} onChange={e => setSeverityFilter(e.target.value)}>
+            <option value="">All Severity</option>
+            {Array.from(new Set(alerts.map(a => a.severity))).map(sev => (
+              <option key={sev} value={sev}>{sev}</option>
+            ))}
+          </select>
+          <select className="px-3 py-2 rounded border" value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">All Status</option>
+            {Array.from(new Set(alerts.map(a => a.status))).map(status => (
+              <option key={status} value={status}>{status}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {loading ? (
         <p className="text-center text-gray-600">Loading alerts...</p>
       ) : alerts.length === 0 ? (
@@ -57,7 +92,14 @@ export default function DMCAlerts() {
               </tr>
             </thead>
             <tbody>
-              {alerts.map((alert, idx) => (
+              {alerts
+                .filter(alert =>
+                  (!typeFilter || alert.alert_type === typeFilter) &&
+                  (!dsFilter || alert.divisional_secretariat === dsFilter) &&
+                  (!severityFilter || alert.severity === severityFilter) &&
+                  (!statusFilter || alert.status === statusFilter)
+                )
+                .map((alert, idx) => (
                 <tr key={idx} className="border-b last:border-b-0">
                   <td className="py-2 px-4 border">{alert.alert_type}</td>
                   <td className="py-2 px-4 border">
