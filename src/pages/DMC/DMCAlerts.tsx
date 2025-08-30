@@ -36,10 +36,6 @@ export default function DMCAlerts() {
     <div className="w-full max-w-4xl mx-auto bg-gray-100 rounded-2xl shadow p-8 mt-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Alerts in Your District</h2>
-        <button className="bg-gray-200 rounded-full px-4 py-1 flex items-center gap-2">
-          <span className="material-icons text-base">filter_list</span>
-          Filter
-        </button>
       </div>
 
       {/* Filter Controls */}
