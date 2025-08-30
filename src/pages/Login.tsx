@@ -97,7 +97,7 @@ export default function Login() {
               required
             >
               <option value="DS Officer">DS Officer</option>
-              <option value="DMC Officer">DMC Officer</option>
+              <option value="DMC Officer">DDMCU Officer</option>
               <option value="Volunteer">Volunteer</option>
             </select>
           </div>

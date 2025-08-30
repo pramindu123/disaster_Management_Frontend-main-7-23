@@ -71,7 +71,7 @@ export default function DMCDashboardLayout() {
           <div className="flex flex-col items-center mb-6">
             <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-200 to-purple-200 mb-2 border-4 border-white shadow" />
             <div className="text-center text-sm text-gray-700 mt-2">
-              <div className="text-base font-semibold mb-1">Role: <span className="text-purple-600">DMC Officer</span></div>
+              <div className="text-base font-semibold mb-1">Role: <span className="text-purple-600">DDMCU Officer</span></div>
               <div className="font-semibold">
                 {dmcOfficer.fullName || "Loading..."}
               </div>
