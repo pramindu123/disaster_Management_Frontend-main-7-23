@@ -435,7 +435,7 @@ export default function SubmitSymptoms() {
 
             {/* Symptoms */}
             <div className="flex flex-col gap-1 md:flex-row md:items-start">
-              <label className="block font-semibold text-base md:text-lg mb-1 md:w-44 md:mt-2">Symptoms</label>
+              <label className="block font-semibold text-base md:text-lg mb-1 md:w-44 md:mt-2">Description</label>
               <div className="w-full flex flex-col">
                 <textarea
                   required
@@ -518,7 +518,7 @@ export default function SubmitSymptoms() {
             <div className="fixed inset-0 flex items-center justify-center z-50">
               <div className="bg-white rounded-2xl shadow-xl px-10 py-8 flex flex-col items-center animate-fadeIn">
                 <div className="text-green-600 text-3xl mb-4 font-bold">✔</div>
-                <div className="text-2xl font-semibold mb-4">Symptoms submitted successfully!</div>
+                <div className="text-2xl font-semibold mb-4">Early Warning Submitted Successfully!</div>
                 <button className="mt-2 px-8 py-2 bg-blue-600 text-white rounded-lg font-bold text-lg hover:bg-blue-700 transition" onClick={() => setShowSuccess(false)}>OK</button>
               </div>
             </div>
