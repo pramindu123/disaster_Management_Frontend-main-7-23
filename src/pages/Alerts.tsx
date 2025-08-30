@@ -188,8 +188,16 @@ export default function Alerts() {
                         {disaster.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4">{disaster.date}</td>
-                    <td className="px-6 py-4">{disaster.time}</td>
+                    {(() => {
+                      const utcString = `${disaster.date}T${disaster.time}Z`;
+                      const dateObj = new Date(utcString);
+                      return (
+                        <>
+                          <td className="px-6 py-4">{dateObj.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
+                          <td className="px-6 py-4">{dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' })}</td>
+                        </>
+                      );
+                    })()}
                   </tr>
                 ))
               )}
