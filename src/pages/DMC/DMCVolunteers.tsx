@@ -14,6 +14,9 @@ interface Volunteer {
 export default function DMCVolunteers() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [districtFilter, setDistrictFilter] = useState('');
+  const [dsFilter, setDSFilter] = useState('');
+  const [availabilityFilter, setAvailabilityFilter] = useState('');
 
   // ✅ Helper to normalize availability safely
   const normalizeAvailability = (value: any): "Available" | "Unavailable" => {
@@ -52,11 +55,37 @@ export default function DMCVolunteers() {
     <div className="w-full max-w-4xl mx-auto bg-gray-100 rounded-2xl shadow p-8 mt-8">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Volunteers in Your District</h2>
-        <button className="bg-gray-200 rounded-full px-4 py-1 flex items-center gap-2">
-          <span className="material-icons text-base">filter_list</span>
-          Filter
-        </button>
       </div>
+
+      {/* Filter Controls */}
+      {!loading && volunteers.length > 0 && (
+        <div className="flex flex-wrap gap-4 mb-4">
+          <select className="px-3 py-2 rounded border" value={districtFilter} onChange={e => {
+            setDistrictFilter(e.target.value);
+            setDSFilter('');
+          }}>
+            <option value="">All Districts</option>
+            {Array.from(new Set(volunteers.map(v => v.district))).map(d => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+          <select className="px-3 py-2 rounded border" value={dsFilter} onChange={e => setDSFilter(e.target.value)}>
+            <option value="">All Divisional Secretariats</option>
+            {Array.from(new Set(volunteers
+              .filter(v => !districtFilter || v.district === districtFilter)
+              .map(v => v.divisional_secretariat)
+            )).map(ds => (
+              <option key={ds} value={ds}>{ds}</option>
+            ))}
+          </select>
+          <select className="px-3 py-2 rounded border" value={availabilityFilter} onChange={e => setAvailabilityFilter(e.target.value)}>
+            <option value="">All Availability</option>
+            {Array.from(new Set(volunteers.map(v => v.availability))).map(av => (
+              <option key={av} value={av}>{av}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {loading ? (
         <p className="text-center text-gray-600">Loading volunteers...</p>
@@ -78,7 +107,13 @@ export default function DMCVolunteers() {
               </tr>
             </thead>
             <tbody>
-              {volunteers.map((vol) => (
+              {volunteers
+                .filter(vol =>
+                  (!districtFilter || vol.district === districtFilter) &&
+                  (!dsFilter || vol.divisional_secretariat === dsFilter) &&
+                  (!availabilityFilter || vol.availability === availabilityFilter)
+                )
+                .map((vol) => (
                 <tr key={vol.userId} className="border-b last:border-b-0">
                   <td className="py-2 px-4 border">{vol.name}</td>
                   <td className="py-2 px-4 border">{vol.divisional_secretariat}</td>
