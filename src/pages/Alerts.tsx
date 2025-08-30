@@ -189,12 +189,13 @@ export default function Alerts() {
                       </span>
                     </td>
                     {(() => {
+                      // Parse as UTC: 'YYYY-MM-DD' + ' ' + 'HH:mm:ss' => 'YYYY-MM-DDTHH:mm:ssZ'
                       const utcString = `${disaster.date}T${disaster.time}Z`;
                       const dateObj = new Date(utcString);
                       return (
                         <>
-                          <td className="px-6 py-4">{dateObj.toLocaleDateString('en-GB', { timeZone: 'UTC' })}</td>
-                          <td className="px-6 py-4">{dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'UTC' })}</td>
+                          <td className="px-6 py-4">{dateObj.toLocaleDateString('en-GB', { timeZone: 'Asia/Colombo' })}</td>
+                          <td className="px-6 py-4">{dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Colombo' })}</td>
                         </>
                       );
                     })()}
