@@ -61,7 +61,12 @@ export default function DMCAlerts() {
                 <tr key={idx} className="border-b last:border-b-0">
                   <td className="py-2 px-4 border">{alert.alert_type}</td>
                   <td className="py-2 px-4 border">
-                    {new Date(alert.date_time).toLocaleString('en-GB', { timeZone: 'Asia/Colombo', hour12: false })}
+                    {(() => {
+                      // Parse as UTC: 'YYYY-MM-DD HH:mm:ss' => 'YYYY-MM-DDTHH:mm:ssZ'
+                      const utcString = alert.date_time.replace(' ', 'T') + 'Z';
+                      const date = new Date(utcString);
+                      return date.toLocaleString('en-GB', { timeZone: 'Asia/Colombo', hour12: false });
+                    })()}
                   </td>
                   <td className="py-2 px-4 border">{alert.district}</td>
                   <td className="py-2 px-4 border">
