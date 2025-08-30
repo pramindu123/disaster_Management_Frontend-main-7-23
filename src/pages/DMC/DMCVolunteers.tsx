@@ -14,7 +14,6 @@ interface Volunteer {
 export default function DMCVolunteers() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [districtFilter, setDistrictFilter] = useState('');
   const [dsFilter, setDSFilter] = useState('');
   const [availabilityFilter, setAvailabilityFilter] = useState('');
 
@@ -60,21 +59,9 @@ export default function DMCVolunteers() {
       {/* Filter Controls */}
       {!loading && volunteers.length > 0 && (
         <div className="flex flex-wrap gap-4 mb-4">
-          <select className="px-3 py-2 rounded border" value={districtFilter} onChange={e => {
-            setDistrictFilter(e.target.value);
-            setDSFilter('');
-          }}>
-            <option value="">All Districts</option>
-            {Array.from(new Set(volunteers.map(v => v.district))).map(d => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
           <select className="px-3 py-2 rounded border" value={dsFilter} onChange={e => setDSFilter(e.target.value)}>
             <option value="">All Divisional Secretariats</option>
-            {Array.from(new Set(volunteers
-              .filter(v => !districtFilter || v.district === districtFilter)
-              .map(v => v.divisional_secretariat)
-            )).map(ds => (
+            {Array.from(new Set(volunteers.map(v => v.divisional_secretariat))).map(ds => (
               <option key={ds} value={ds}>{ds}</option>
             ))}
           </select>
@@ -109,7 +96,6 @@ export default function DMCVolunteers() {
             <tbody>
               {volunteers
                 .filter(vol =>
-                  (!districtFilter || vol.district === districtFilter) &&
                   (!dsFilter || vol.divisional_secretariat === dsFilter) &&
                   (!availabilityFilter || vol.availability === availabilityFilter)
                 )
