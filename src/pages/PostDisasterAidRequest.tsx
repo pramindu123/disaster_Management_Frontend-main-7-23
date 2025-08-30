@@ -172,10 +172,7 @@ export default function PostDisasterAidRequest() {
             Post Disaster Aid Request
           </h1>
 
-          <div className="bg-blue-50 border border-blue-300 p-4 rounded-lg mb-4 text-blue-800">
-            <strong>Location Detection:</strong> Use <strong>"Use GPS"</strong> to auto-detect your
-            location, or manually select your district and divisional secretariat.
-          </div>
+
 
           <div className="bg-green-50 border border-green-300 p-4 rounded-lg mb-6 flex items-center gap-2 text-green-700">
             <CheckCircle className="w-5 h-5" />
