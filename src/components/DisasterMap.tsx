@@ -156,8 +156,17 @@ export default function DisasterMap({
           <Popup>
       <strong>Type:</strong> {alert.type}<br />
       <strong>Severity:</strong> {alert.severity}<br />
-      <strong>Date:</strong> {alert.date}<br />
-      <strong>Time:</strong> {alert.time}
+      {(() => {
+        // Parse as UTC: 'YYYY-MM-DD' + ' ' + 'HH:mm:ss' => 'YYYY-MM-DDTHH:mm:ssZ'
+        const utcString = `${alert.date}T${alert.time}Z`;
+        const dateObj = new Date(utcString);
+        return (
+          <>
+            <strong>Date:</strong> {dateObj.toLocaleDateString('en-GB', { timeZone: 'Asia/Colombo' })}<br />
+            <strong>Time:</strong> {dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Colombo' })}
+          </>
+        );
+      })()}
     </Popup>
          
         </CircleMarker>
