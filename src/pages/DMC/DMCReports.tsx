@@ -205,7 +205,7 @@ export default function DMCReports() {
   return (
     <div className="w-full max-w-4xl mx-auto bg-gray-100 rounded-2xl shadow p-8 mt-8">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Pending Symptom Reports</h2>
+        <h2 className="text-2xl font-bold">Pending Early Warning Reports</h2>
       </div>
 
       <div className="overflow-x-auto">
